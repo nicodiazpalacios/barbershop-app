@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:id="@+id/main"
+    tools:context=".ui.NewTurnoActivity">
+
+    <!-- Campo Fecha -->
+    <EditText
+        android:id="@+id/edit_fecha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Fecha (YYYY-MM-DD)"
+        android:inputType="date" />
+
+    <!-- Campo Horario de inicio -->
+    <EditText
+        android:id="@+id/edit_inicio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Hora inicio (HH:MM)"
+        android:inputType="time"
+        android:layout_marginTop="16dp" />
+
+    <!-- Campo Horario de fin -->
+    <EditText
+        android:id="@+id/edit_fin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Hora fin (HH:MM)"
+        android:inputType="time"
+        android:layout_marginTop="16dp" />
+
+    <!-- Botón Guardar -->
+    <Button
+        android:id="@+id/btn_guardar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Guardar turno"
+        android:layout_marginTop="24dp" />
+
+</LinearLayout>

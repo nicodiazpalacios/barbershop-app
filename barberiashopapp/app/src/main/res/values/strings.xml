@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">barberiashop-app</string>
+    <string name="add_turno">add_turno</string>
 </resources>
