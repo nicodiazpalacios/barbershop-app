@@ -6,13 +6,15 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import com.example.barberiashop_app.data.dao.ServicioDao;
 import com.example.barberiashop_app.data.dao.TurnoDao;
+import com.example.barberiashop_app.domain.entity.Servicio;
 import com.example.barberiashop_app.domain.entity.Turno;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Turno.class}, version = 1, exportSchema = false)
+@Database(entities = {Turno.class, Servicio.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     // Instancia unica de la base de datos (Singleton)
     // 'volatile' garantiza que siempre se lea el valor actualizado en memoria,
@@ -30,6 +32,7 @@ public abstract class AppDatabase extends RoomDatabase {
     // Metodo abstracto que da acceso al DAO (Data Access Object) de Turno.
     // Room genera la implementacion en tiempo de compilacion.
     public abstract TurnoDao turnoDao();
+    public abstract ServicioDao servicioDao();
 
     //  Metodo estatico que devuelve la instancia unica de la base de datos.
     // Si no existe, se crea utilizando Room.databaseBuilder.
