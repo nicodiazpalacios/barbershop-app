@@ -42,4 +42,6 @@ Las principales características que la app a desarrollar para los clientes tien
 
 ### Imágenes y diagramas
 
+[Pantallas en Figma](https://www.figma.com/design/nwosqibEOHiJJpqCR6x7AZ/LAB-VI---App-Barberia?node-id=0-1&t=fu5XXFOQfMwzQskw-1)
+
 ![Diagrama de la base de datos](capturas/drawSQL-app-barberia.png)
