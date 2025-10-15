@@ -7,53 +7,65 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.barberiashop_app.R;
 import com.example.barberiashop_app.databinding.FragmentServiciosBinding;
+import com.example.barberiashop_app.domain.entity.Servicio;
 
-public class ServiciosFragment extends Fragment {
-
-//    private ServiciosViewModel mViewModel;
-//
-//    public static ServiciosFragment newInstance() {
-//        return new ServiciosFragment();
-//    }
+public class ServiciosFragment extends Fragment implements ServiciosListAdapter.OnItemClickListener {
 
     private FragmentServiciosBinding binding;
+    private ServiciosViewModel serviciosViewModel;
+
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
-        ServiciosViewModel serviciosViewModel =
-                new ViewModelProvider(this).get(ServiciosViewModel.class);
 
         binding = FragmentServiciosBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textServicios;
-        serviciosViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        serviciosViewModel = new ViewModelProvider(this).get(ServiciosViewModel.class);
 
-//        return inflater.inflate(R.layout.fragment_servicios, container, false);
+        final ServiciosListAdapter adapter = new ServiciosListAdapter(new ServiciosListAdapter.ServicioDiff(), this);
+        binding.recyclerViewServicios.setAdapter(adapter);
+        binding.recyclerViewServicios.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        serviciosViewModel.getAllServicios().observe(getViewLifecycleOwner(), servicios -> {
+            adapter.submitList(servicios);
+        });
+
+        // Opcional: Configurar el título si no está fijo en el XML
+        // binding.tvTituloServicios.setText("Servicios disponibles");
         return root;
     }
-
-//    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        mViewModel = new ViewModelProvider(this).get(ServiciosViewModel.class);
-//        // TODO: Use the ViewModel
-//    }
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         binding = null;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    @Override
+    public void onReservarClick(Servicio servicio) {
+        Toast.makeText(getContext(), "Has seleccionado: " + servicio.getNombre() + ". Precio: " + servicio.getPrecio(), Toast.LENGTH_SHORT).show();
+
+        // TODO:  implementar la navegacion al fragmento de simulación de calendario/turno
+        // Ejemplo: navigateToCalendar(servicio.getId());
     }
 }

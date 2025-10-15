@@ -2,9 +2,11 @@ package com.example.barberiashop_app.data.db;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.barberiashop_app.data.dao.ServicioDao;
 import com.example.barberiashop_app.data.dao.TurnoDao;
@@ -50,6 +52,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             // y no defines una migracion, esta opcion BORRA y recrea la DB.
                             // Se pierden los datos, pero es util en desarrollo.
                             .fallbackToDestructiveMigration()
+                            .addCallback(sRoomDatabaseCallback)
                             .build();
                 }
 
@@ -57,5 +60,29 @@ public abstract class AppDatabase extends RoomDatabase {
         }
         return INSTANCIA;
     }
+
+    private static final RoomDatabase.Callback sRoomDatabaseCallback = new RoomDatabase.Callback() {
+        @Override
+        public void onCreate(@NonNull SupportSQLiteDatabase db) {
+            super.onCreate(db);
+
+            // Ejecutar la inserción en el pool de hilos de background
+            databaseWriteExecutor.execute(() -> {
+                ServicioDao dao = INSTANCIA.servicioDao();
+
+                // Opcional: Limpiar datos antiguos si es una nueva creación
+                // dao.deleteAll();
+
+                // Servicios de Peluquería/Barbería
+                dao.insert(new Servicio("Corte de pelo (Hombre)", "Corte clásico o moderno con tijera y/o máquina.", 8.00, 40));
+                dao.insert(new Servicio("Arreglo de barba", "Afeitado tradicional con navaja y perfilado de barba.", 7.50, 30));
+                dao.insert(new Servicio("Corte y Barba Full", "Servicio completo de corte de pelo y arreglo de barba.", 14.50, 70));
+
+                // Nuevos servicios
+                dao.insert(new Servicio("Diseño de cejas", "Perfilado profesional de cejas con cera o pinzas.", 4.00, 15));
+                dao.insert(new Servicio("Lavado y Secado", "Lavado con productos especializados y peinado rápido.", 4.50, 20));
+            });
+        }
+    };
 
 }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="12dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@drawable/background_servicio_item"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tv_nombre_servicio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_reservar"
+            tools:text="Corte de pelo" />
+
+        <TextView
+            android:id="@+id/tv_descripcion_servicio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_nombre_servicio"
+            app:layout_constraintEnd_toStartOf="@+id/btn_reservar"
+            tools:text="Descripción apropiada para un corte de pelo" />
+
+        <TextView
+            android:id="@+id/tv_precio_servicio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_descripcion_servicio"
+            tools:text="$5.99" />
+
+        <ImageView
+            android:id="@+id/iv_duration_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_time_circle"
+            app:tint="?attr/colorOnSurface"
+            app:layout_constraintStart_toEndOf="@+id/tv_precio_servicio"
+            app:layout_constraintTop_toTopOf="@+id/tv_precio_servicio"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_precio_servicio"
+            android:contentDescription="Duración" />
+
+        <TextView
+            android:id="@+id/tv_duracion_servicio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_marginStart="4dp"
+            app:layout_constraintStart_toEndOf="@+id/iv_duration_icon"
+            app:layout_constraintTop_toTopOf="@+id/iv_duration_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_duration_icon"
+            tools:text="30 min" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_reservar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reservar"
+            app:cornerRadius="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
