@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<menu xmlns:android="http://schemas.android.com/apk/res/android">-->
+<!--    <item-->
+<!--        android:id="@+id/nav_servicios"-->
+<!--        android:icon="@drawable/content_cut" android:title="Servicios" />-->
+
+<!--    <item-->
+<!--        android:id="@+id/nav_mis_turnos"-->
+<!--        android:icon="@drawable/calendar_month" android:title="Mis Turnos" />-->
+
+<!--    <item-->
+<!--        android:id="@+id/nav_mi_perfil"-->
+<!--        android:icon="@drawable/account_circle" android:title="Mi perfil" />-->
+<!--</menu>-->
+
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+<item
+    android:id="@+id/navigation_servicios"
+    android:icon="@drawable/content_cut"
+    android:title="@string/title_servicio" />
+
+<item
+    android:id="@+id/navigation_turnos"
+    android:icon="@drawable/calendar_month"
+    android:title="@string/title_turno" />
+
+<item
+    android:id="@+id/navigation_notifications"
+    android:icon="@drawable/account_circle"
+    android:title="@string/title_perfil" />
+
+</menu>

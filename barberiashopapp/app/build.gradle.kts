@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.recyclerview)
+    implementation(libs.legacy.support.v4)
     val room_version = "2.8.1"
 
     implementation("androidx.room:room-runtime:$room_version")
@@ -45,6 +45,13 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
+    implementation(libs.annotation)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+    //implementation(libs.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

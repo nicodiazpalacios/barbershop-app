@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/navigation_servicios"
+        android:name="com.example.barberiashop_app.ui.servicios.ServiciosFragment"
+        android:label="@string/title_servicio"
+        tools:layout="@layout/fragment_servicios" />
+
+    <fragment
+        android:id="@+id/navigation_turnos"
+        android:name="com.example.barberiashop_app.ui.turnos.TurnosFragment"
+        android:label="@string/title_turno"
+        tools:layout="@layout/fragment_turnos" />
+
+    <fragment
+        android:id="@+id/navigation_notifications"
+        android:name="com.example.barberiashop_app.ui.perfi_usuario.PerfilUsuarioFragment"
+        android:label="@string/title_perfil"
+        tools:layout="@layout/fragment_perfil_usuario" >
+        <action
+            android:id="@+id/action_perfilUsuarioFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.barberiashop_app.ui.login.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_navigation_servicios"
+            app:destination="@id/navigation_servicios" />
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_recuperarContraseniaFragment"
+            app:destination="@id/recuperarContraseniaFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.barberiashop_app.ui.register.RegisterFragment"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_navigation_servicios"
+            app:destination="@id/navigation_servicios" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recuperarContraseniaFragment"
+        android:name="com.example.barberiashop_app.ui.recuperar_contrasenia.RecuperarContraseniaFragment"
+        android:label="fragment_recover_password"
+        tools:layout="@layout/fragment_recuperar_contrasenia" />
+
+</navigation>
