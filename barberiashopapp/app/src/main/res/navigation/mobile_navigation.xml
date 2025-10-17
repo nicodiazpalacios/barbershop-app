@@ -16,6 +16,19 @@
         android:name="com.example.barberiashop_app.ui.turnos.TurnosFragment"
         android:label="@string/title_turno"
         tools:layout="@layout/fragment_turnos" />
+    <fragment
+        android:id="@+id/reservarTurnoFragment"
+        android:name="com.example.barberiashop_app.ui.reservar_turno.ReservarTurnoFragment"
+        android:label="Reservar Turno"
+        tools:layout="@layout/fragment_reservar_turno">
+
+        <!--Argumento que se pasa con Safe Args -->
+        <argument
+            android:name="servicioId"
+            app:argType="integer" />
+
+    </fragment>
+
 
     <fragment
         android:id="@+id/navigation_notifications"

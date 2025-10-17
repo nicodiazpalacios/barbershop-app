@@ -23,6 +23,11 @@ public class ServicioRepository {
     public LiveData<List<Servicio>> getAllServicios(){
         return allServicios;
     }
+
+    public LiveData<Servicio> getServicioById(int id){
+        return servicioDao.getServicioById(id);
+    }
+
     public void insert(Servicio servicio){
         AppDatabase.databaseWriteExecutor.execute(() -> servicioDao.insert(servicio));
     }

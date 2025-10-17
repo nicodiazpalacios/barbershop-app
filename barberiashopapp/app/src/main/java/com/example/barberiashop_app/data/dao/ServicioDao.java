@@ -30,6 +30,6 @@ public interface ServicioDao {
     LiveData<List<Servicio>> getAllServicios();
 
     @Query("SELECT * FROM servicios WHERE id = :id")
-    Servicio getServicioById(int id);
+    LiveData<Servicio> getServicioById(int id);
 
 }
