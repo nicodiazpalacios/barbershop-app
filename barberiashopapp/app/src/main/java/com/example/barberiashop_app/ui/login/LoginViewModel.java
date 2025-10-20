@@ -6,15 +6,21 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.example.barberiashop_app.UserPreferences;
+import com.example.barberiashop_app.data.db.AppDatabase;
+import com.example.barberiashop_app.data.repository.UsuarioRepository;
+import com.example.barberiashop_app.domain.entity.Usuario;
 
 public class LoginViewModel extends AndroidViewModel {
 
-    private UserPreferences userPrefs;
-    private MutableLiveData<Boolean> loginResult = new MutableLiveData<>();
+    private final UsuarioRepository usuarioRepository;
+    private final UserPreferences userPrefs;
 
-    public LoginViewModel(@NonNull Application application) {
+    private final MutableLiveData<Boolean> loginResult = new MutableLiveData<>();
+
+    public LoginViewModel(Application application) {
         super(application);
-        userPrefs = new UserPreferences(application.getApplicationContext());
+        usuarioRepository = new UsuarioRepository(application);
+        userPrefs = new UserPreferences(application);
     }
 
     public LiveData<Boolean> getLoginResult() {
@@ -22,11 +28,27 @@ public class LoginViewModel extends AndroidViewModel {
     }
 
     public void loginUser(String email, String password) {
-        if (userPrefs.validateUser(email, password)) {
-            userPrefs.setLoggedIn(true);
-            loginResult.setValue(true);
-        } else {
-            loginResult.setValue(false);
-        }
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            Usuario usuario = usuarioRepository.login(email, password);
+
+            if (usuario != null) {
+                // guardar datos en SharedPreferences
+                userPrefs.registerUser(
+                        usuario.getNombre(),
+                        usuario.getEmail(),
+                        usuario.getCelular(),
+                        usuario.getContrasenia(),
+                        usuario.getFotoUrl()
+                );
+                userPrefs.setLoggedIn(true);
+                loginResult.postValue(true);
+            } else {
+                loginResult.postValue(false);
+            }
+        });
+    }
+
+    public void logout() {
+        userPrefs.logoutUser();
     }
 }

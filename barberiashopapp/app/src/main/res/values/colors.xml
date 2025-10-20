@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="estado_pendiente">#FFF59D</color>  <!-- amarillo -->
+    <color name="estado_confirmado">#A5D6A7</color> <!-- verde -->
+    <color name="estado_cancelado">#EF9A9A</color>  <!-- rojo -->
 </resources>

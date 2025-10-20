@@ -28,4 +28,15 @@ public interface UsuarioDao {
 
     @Query("SELECT * FROM usuario WHERE email = :email")
     LiveData<Usuario> findByEmail(String email);
+
+    @Query("SELECT * FROM usuario WHERE nombre = :nombre LIMIT 1")
+    LiveData<Usuario> getUsuarioPorNombre(String nombre );
+
+    //Esta devuelve directamente el objeto Usuario (no LiveData), ideal para lógica interna.
+    @Query("SELECT * FROM usuario WHERE email = :email LIMIT 1")
+    Usuario getUsuarioPorEmailSync(String email);
+
+    @Query("SELECT * FROM usuario WHERE email = :email AND contrasenia = :password LIMIT 1")
+    Usuario login(String email, String password);
+
 }

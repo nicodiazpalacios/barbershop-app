@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,30 +19,36 @@ import com.example.barberiashop_app.R;
 import com.example.barberiashop_app.databinding.FragmentTurnosBinding;
 
 public class TurnosFragment extends Fragment {
-
-//    private TurnosViewModel mViewModel;
-//
-//    public static TurnosFragment newInstance() {
-//        return new TurnosFragment();
-//    }
-//
-
     private FragmentTurnosBinding binding;
+    private TurnosAdapter adapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        TurnosViewModel turnosViewModel =
-            new ViewModelProvider(this).get(TurnosViewModel.class);
-
         binding = FragmentTurnosBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textTurnos;
-        turnosViewModel
-                .getText()
-                .observe(getViewLifecycleOwner(), textView::setText);
+        adapter = new TurnosAdapter();
+        binding.recyclerTurnos.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recyclerTurnos.setAdapter(adapter);
+
+        TurnosViewModel viewModel = new ViewModelProvider(this).get(TurnosViewModel.class);
+        viewModel.getTurnosUsuario().observe(getViewLifecycleOwner(), turnos -> {
+            if (turnos == null || turnos.isEmpty()) {
+                binding.recyclerTurnos.setVisibility(View.GONE);
+                binding.layoutNoTurnos.setVisibility(View.VISIBLE);
+            } else {
+                binding.recyclerTurnos.setVisibility(View.VISIBLE);
+                binding.layoutNoTurnos.setVisibility(View.GONE);
+                adapter.setTurnos(turnos);
+            }
+        });
+
+        binding.btnIrAServicios.setOnClickListener(v -> {
+            Navigation.findNavController(v).popBackStack();
+            Navigation.findNavController(v).navigate(R.id.navigation_servicios);
+        });
 
         return root;
     }

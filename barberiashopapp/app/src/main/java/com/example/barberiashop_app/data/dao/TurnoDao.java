@@ -31,4 +31,8 @@ public interface TurnoDao {
 
     @Query("SELECT * FROM turnos WHERE id = :id")
     Turno getTurnoById(int id);
+
+    //Nuevo: obtener solo los turnos de un usuario específico
+    @Query("SELECT * FROM turnos WHERE usuario_email = :email ORDER BY fecha ASC")
+    LiveData<List<Turno>> getTurnosByUsuario(String email);
 }

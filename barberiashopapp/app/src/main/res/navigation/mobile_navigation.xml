@@ -9,7 +9,11 @@
         android:id="@+id/navigation_servicios"
         android:name="com.example.barberiashop_app.ui.servicios.ServiciosFragment"
         android:label="@string/title_servicio"
-        tools:layout="@layout/fragment_servicios" />
+        tools:layout="@layout/fragment_servicios">
+        <action
+            android:id="@+id/action_serviciosFragment_to_reservarTurnoFragment"
+            app:destination="@id/reservarTurnoFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_turnos"
