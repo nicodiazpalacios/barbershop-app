@@ -152,15 +152,8 @@ public class ReservarTurnoFragment extends Fragment {
         viewModel.insertTurno(nuevoTurno);
 
         Toast.makeText(getContext(), "✅ Reserva confirmada: " + fecha + " a las " + horario, Toast.LENGTH_LONG).show();
-
-        // Navegar a Mis Turnos (si lo tenés configurado)
         NavController navController = Navigation.findNavController(requireView());
+        navController.navigate(R.id.action_reservarTurnoFragment_to_navigation_turnos);
 
-        navController.popBackStack();
-        navController.navigate(R.id.navigation_turnos);
-//        binding.btnIrAServicios.setOnClickListener(v -> {
-//            Navigation.findNavController(v).popBackStack();
-//            Navigation.findNavController(v).navigate(R.id.navigation_servicios);
-//        });
     }
 }

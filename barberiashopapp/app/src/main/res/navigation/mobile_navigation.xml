@@ -19,7 +19,9 @@
         android:id="@+id/navigation_turnos"
         android:name="com.example.barberiashop_app.ui.turnos.TurnosFragment"
         android:label="@string/title_turno"
-        tools:layout="@layout/fragment_turnos" />
+        tools:layout="@layout/fragment_turnos" >
+
+    </fragment>
     <fragment
         android:id="@+id/reservarTurnoFragment"
         android:name="com.example.barberiashop_app.ui.reservar_turno.ReservarTurnoFragment"
@@ -30,6 +32,12 @@
         <argument
             android:name="servicioId"
             app:argType="integer" />
+
+        <action
+            android:id="@+id/action_reservarTurnoFragment_to_navigation_turnos"
+            app:destination="@id/navigation_turnos"
+            app:popUpTo="@id/reservarTurnoFragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
 
@@ -75,5 +83,11 @@
         android:name="com.example.barberiashop_app.ui.recuperar_contrasenia.RecuperarContraseniaFragment"
         android:label="fragment_recover_password"
         tools:layout="@layout/fragment_recuperar_contrasenia" />
+
+    <action
+        android:id="@+id/action_global_navigation_turnos"
+        app:destination="@id/navigation_turnos"
+        app:popUpTo="@id/navigation_servicios"
+        app:popUpToInclusive="false" />
 
 </navigation>
