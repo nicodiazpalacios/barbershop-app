@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
                 Rol.class,
                 EstadoTurno.class,
                 Usuario.class
-        }, version = 4,
+        }, version = 5,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {

@@ -34,4 +34,8 @@ public class TurnosViewModel extends AndroidViewModel {
     public LiveData<List<Turno>> getTurnosUsuario() {
         return turnosUsuario;
     }
+
+    public void actualizarTurno(Turno turno) {
+        turnoRepository.update(turno);
+    }
 }

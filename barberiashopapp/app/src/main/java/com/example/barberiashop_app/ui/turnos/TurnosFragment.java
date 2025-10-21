@@ -45,8 +45,19 @@ public class TurnosFragment extends Fragment {
             }
         });
 
+        adapter.setOnEstadoClickListener(turno -> {
+            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Cancelar turno")
+                    .setMessage("¿Querés cancelar este turno?")
+                    .setPositiveButton("Sí, cancelar", (dialog, which) -> {
+                        turno.setEstadoId(3); // 3 = cancelado
+                        viewModel.actualizarTurno(turno);
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
+
         binding.btnIrAServicios.setOnClickListener(v -> {
-            Navigation.findNavController(v).popBackStack();
             Navigation.findNavController(v).navigate(R.id.navigation_servicios);
         });
 

@@ -83,11 +83,4 @@
         android:name="com.example.barberiashop_app.ui.recuperar_contrasenia.RecuperarContraseniaFragment"
         android:label="fragment_recover_password"
         tools:layout="@layout/fragment_recuperar_contrasenia" />
-
-    <action
-        android:id="@+id/action_global_navigation_turnos"
-        app:destination="@id/navigation_turnos"
-        app:popUpTo="@id/navigation_servicios"
-        app:popUpToInclusive="false" />
-
 </navigation>

@@ -17,6 +17,15 @@ import java.util.List;
 public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewHolder> {
 
     private List<Turno> turnos = new ArrayList<>();
+    private OnEstadoClickListener listener;
+
+    public interface OnEstadoClickListener {
+        void onEstadoClick(Turno turno);
+    }
+
+    public void setOnEstadoClickListener(OnEstadoClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setTurnos(List<Turno> nuevosTurnos) {
         this.turnos = nuevosTurnos;
@@ -30,7 +39,12 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
         holder.textFecha.setText(turno.getFecha());
         holder.textHora.setText(turno.getHorarioInicio());
         holder.textServicio.setText("Corte de pelo"); // temporal, hasta unir con servicio
-        holder.textEstado.setText("Pendiente"); // temporal
+        holder.textEstado.setText(turno.getEstadoNombre()); // asumiendo que tenés ese campo o relación
+
+
+        holder.textEstado.setOnClickListener(v -> {
+            if (listener != null) listener.onEstadoClick(turno);
+        });
     }
 
     @Override
