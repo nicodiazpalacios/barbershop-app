@@ -13,6 +13,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_servicio">Servicios</string>
+    <string name="title_personal">Personal</string>
     <string name="title_turno">Turnos</string>
     <string name="title_perfil">Mi Perfil</string>
 </resources>

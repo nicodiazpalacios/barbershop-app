@@ -15,7 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity {
 
     private UserPreferences userPrefs;
-    private ActivityMainBinding binding;
+    private ActivityMainBinding binding;    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
