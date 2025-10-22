@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
+import androidx.navigation.NavGraph;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -40,8 +41,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        NavGraph navGraph = navController.getNavInflater().inflate(R.navigation.mobile_navigation);
+
         if (userPrefs.isLoggedIn()) {
-            navController.navigate(R.id.navigation_servicios);
+            navGraph.setStartDestination(R.id.navigation_servicios);
+        } else {
+            navGraph.setStartDestination(R.id.loginFragment);
         }
+
+        navController.setGraph(navGraph);
     }
 }

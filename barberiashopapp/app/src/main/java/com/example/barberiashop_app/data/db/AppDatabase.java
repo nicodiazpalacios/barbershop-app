@@ -8,15 +8,30 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.example.barberiashop_app.data.dao.EstadoTurnoDao;
+import com.example.barberiashop_app.data.dao.RolDao;
 import com.example.barberiashop_app.data.dao.ServicioDao;
 import com.example.barberiashop_app.data.dao.TurnoDao;
+import com.example.barberiashop_app.data.dao.UsuarioDao;
+import com.example.barberiashop_app.domain.entity.EstadoTurno;
+import com.example.barberiashop_app.domain.entity.Rol;
 import com.example.barberiashop_app.domain.entity.Servicio;
 import com.example.barberiashop_app.domain.entity.Turno;
+import com.example.barberiashop_app.domain.entity.Usuario;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Turno.class, Servicio.class}, version = 2, exportSchema = false)
+@Database(
+        entities = {
+                Turno.class,
+                Servicio.class,
+                Rol.class,
+                EstadoTurno.class,
+                Usuario.class
+        }, version = 5,
+        exportSchema = false
+)
 public abstract class AppDatabase extends RoomDatabase {
     // Instancia unica de la base de datos (Singleton)
     // 'volatile' garantiza que siempre se lea el valor actualizado en memoria,
@@ -35,6 +50,9 @@ public abstract class AppDatabase extends RoomDatabase {
     // Room genera la implementacion en tiempo de compilacion.
     public abstract TurnoDao turnoDao();
     public abstract ServicioDao servicioDao();
+    public abstract UsuarioDao usuarioDao();
+    public abstract RolDao rolDao();
+    public abstract EstadoTurnoDao estadoTurnoDao();
 
     //  Metodo estatico que devuelve la instancia unica de la base de datos.
     // Si no existe, se crea utilizando Room.databaseBuilder.
@@ -68,19 +86,37 @@ public abstract class AppDatabase extends RoomDatabase {
 
             // Ejecutar la inserción en el pool de hilos de background
             databaseWriteExecutor.execute(() -> {
-                ServicioDao dao = INSTANCIA.servicioDao();
+                // DAOs
+                ServicioDao servicioDao = INSTANCIA.servicioDao();
+                RolDao rolDao = INSTANCIA.rolDao();
+                EstadoTurnoDao estadoTurnoDao = INSTANCIA.estadoTurnoDao();
+                UsuarioDao usuarioDao = INSTANCIA.usuarioDao();
 
-                // Opcional: Limpiar datos antiguos si es una nueva creación
-                // dao.deleteAll();
+                // --- SERVICIOS ---
+                servicioDao.insert(new Servicio("Corte de pelo (Hombre)", "Corte clásico o moderno con tijera y/o máquina.", 8.00, 40));
+                servicioDao.insert(new Servicio("Arreglo de barba", "Afeitado tradicional con navaja y perfilado de barba.", 7.50, 30));
+                servicioDao.insert(new Servicio("Corte y Barba Full", "Servicio completo de corte de pelo y arreglo de barba.", 14.50, 70));
+                servicioDao.insert(new Servicio("Diseño de cejas", "Perfilado profesional de cejas con cera o pinzas.", 4.00, 15));
+                servicioDao.insert(new Servicio("Lavado y Secado", "Lavado con productos especializados y peinado rápido.", 4.50, 20));
 
-                // Servicios de Peluquería/Barbería
-                dao.insert(new Servicio("Corte de pelo (Hombre)", "Corte clásico o moderno con tijera y/o máquina.", 8.00, 40));
-                dao.insert(new Servicio("Arreglo de barba", "Afeitado tradicional con navaja y perfilado de barba.", 7.50, 30));
-                dao.insert(new Servicio("Corte y Barba Full", "Servicio completo de corte de pelo y arreglo de barba.", 14.50, 70));
+                // --- ROLES ---
+                Rol rolCliente = new Rol("cliente");
+                Rol rolBarbero = new Rol("barbero");
+                Rol rolDueno = new Rol("dueño");
+                rolDao.insert(rolCliente);
+                rolDao.insert(rolBarbero);
+                rolDao.insert(rolDueno);
 
-                // Nuevos servicios
-                dao.insert(new Servicio("Diseño de cejas", "Perfilado profesional de cejas con cera o pinzas.", 4.00, 15));
-                dao.insert(new Servicio("Lavado y Secado", "Lavado con productos especializados y peinado rápido.", 4.50, 20));
+                // --- ESTADOS DE TURNO ---
+                estadoTurnoDao.insert(new EstadoTurno("pendiente"));
+                estadoTurnoDao.insert(new EstadoTurno("confirmado"));
+                estadoTurnoDao.insert(new EstadoTurno("cancelado"));
+
+                // --- USUARIOS ---
+                // Podés usar contraseñas simples por ahora, ya que no estás aplicando hash
+                usuarioDao.insert(new Usuario("Carlos Gómez", "cliente@cliente.com", "1234", null, "1122334455", 1)); // cliente
+                usuarioDao.insert(new Usuario("Juan Pérez", "barbero@barbero.com", "1234", null, "1166778899", 2));     // barbero
+                usuarioDao.insert(new Usuario("Pedro López", "dueno@dueno.com", "1234", null, "1100112233", 3));     // dueño
             });
         }
     };

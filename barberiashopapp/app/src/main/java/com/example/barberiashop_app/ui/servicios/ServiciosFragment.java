@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
@@ -63,9 +64,14 @@ public class ServiciosFragment extends Fragment implements ServiciosListAdapter.
 
     @Override
     public void onReservarClick(Servicio servicio) {
-        Toast.makeText(getContext(), "Has seleccionado: " + servicio.getNombre() + ". Precio: " + servicio.getPrecio(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Has seleccionado: " + servicio.getNombre(), Toast.LENGTH_SHORT).show();
 
-        // TODO:  implementar la navegacion al fragmento de simulación de calendario/turno
-        // Ejemplo: navigateToCalendar(servicio.getId());
+        // 🧭 Crear la acción de navegación con Safe Args
+        ServiciosFragmentDirections.ActionServiciosFragmentToReservarTurnoFragment action =
+                ServiciosFragmentDirections.actionServiciosFragmentToReservarTurnoFragment(servicio.getId());
+
+        // 🔀 Navegar al fragmento de reserva
+
+        NavHostFragment.findNavController(this).navigate(action);
     }
 }

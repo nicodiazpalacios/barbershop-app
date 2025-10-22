@@ -25,6 +25,11 @@ public class TurnoRepository {
         return allTurnos;
     }
 
+
+    public LiveData<List<Turno>> getTurnosByUsuario(String email) {
+        return turnoDao.getTurnosByUsuario(email);
+    }
+
     public void insert(Turno turno){
         AppDatabase.databaseWriteExecutor.execute(() -> turnoDao.insert(turno));
     }
