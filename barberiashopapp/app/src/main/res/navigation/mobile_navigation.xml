@@ -19,9 +19,14 @@
         android:id="@+id/navigation_turnos"
         android:name="com.example.barberiashop_app.ui.turnos.TurnosFragment"
         android:label="@string/title_turno"
-        tools:layout="@layout/fragment_turnos" >
+        tools:layout="@layout/fragment_turnos" />
 
-    </fragment>
+    <fragment
+        android:id="@+id/navigation_personal"
+        android:name="com.example.barberiashop_app.ui.personal.PersonalFragment"
+        android:label="@string/title_personal"
+        tools:layout="@layout/fragment_personal" />
+
     <fragment
         android:id="@+id/reservarTurnoFragment"
         android:name="com.example.barberiashop_app.ui.reservar_turno.ReservarTurnoFragment"
