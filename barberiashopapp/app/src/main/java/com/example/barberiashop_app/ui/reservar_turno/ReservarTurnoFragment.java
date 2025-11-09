@@ -123,6 +123,8 @@ public class ReservarTurnoFragment extends Fragment {
         datePicker.show(getParentFragmentManager(), "DATE_PICKER");
     }
 
+
+
     /**
      * Mostrar lista de horarios hardcodeados
     */
@@ -132,10 +134,12 @@ public class ReservarTurnoFragment extends Fragment {
             return;
         }
 
-        List<String> horarios = Arrays.asList(
-                "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM",
-                "12:00 PM", "01:00 PM", "03:00 PM", "05:00 PM", "07:00 PM"
-        );
+        // Rango de horarios (puedes ajustarlo)
+        int horaInicio = 8;  // 8 AM
+        int horaFin = 20;    // 8 PM
+
+        // Generar lista de horarios cada 1 hora
+        List<String> horarios = generateHourlySlots(horaInicio, horaFin);
 
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Selecciona un horario")
@@ -144,6 +148,23 @@ public class ReservarTurnoFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Genera una lista de horarios con intervalo de 1 hora (ej: 08:00 AM, 09:00 AM, etc.)
+     */
+    private List<String> generateHourlySlots(int startHour, int endHour) {
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        List<String> slots = new java.util.ArrayList<>();
+        for (int hour = startHour; hour <= endHour; hour++) {
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            slots.add(sdf.format(calendar.getTime()));
+        }
+        return slots;
+    }
 
     /**
      * Confirmar reserva y navegar al fragment de "Mis Turnos"
