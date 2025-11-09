@@ -21,14 +21,18 @@ import com.example.barberiashop_app.UserPreferences;
 import com.example.barberiashop_app.databinding.FragmentReservarTurnoBinding;
 import com.example.barberiashop_app.domain.entity.Servicio;
 import com.example.barberiashop_app.domain.entity.Turno;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.Calendar;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class ReservarTurnoFragment extends Fragment {
     private FragmentReservarTurnoBinding binding;
@@ -86,20 +90,32 @@ public class ReservarTurnoFragment extends Fragment {
         binding = null;
     }
 
+    //TODO: Pasar a utils functions
     /**
      * Mostrar selector de fecha
      */
     private void showDatePicker() {
+        Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        utcCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        utcCalendar.set(Calendar.MINUTE, 0);
+        utcCalendar.set(Calendar.SECOND, 0);
+        utcCalendar.set(Calendar.MILLISECOND, 0);
+
+        long startTodayInUtc = utcCalendar.getTimeInMillis();
+
+        CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+        constraintsBuilder.setValidator(DateValidatorPointForward.from(startTodayInUtc));
+        constraintsBuilder.setStart(startTodayInUtc);
+
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecciona una fecha")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setCalendarConstraints(constraintsBuilder.build())
                 .build();
 
         datePicker.addOnPositiveButtonClickListener(selection -> {
             String selectedDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date(selection));
             binding.inputFecha.setText(selectedDate);
-
-            // Habilitar input de horario una vez elegida la fecha
             binding.inputHorario.setEnabled(true);
             binding.layoutHorario.setAlpha(1f);
         });
