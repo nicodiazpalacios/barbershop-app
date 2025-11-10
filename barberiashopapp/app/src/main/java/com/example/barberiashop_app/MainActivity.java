@@ -10,13 +10,16 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.barberiashop_app.data.db.AppDatabase;
+import com.example.barberiashop_app.data.repository.UsuarioRepository;
 import com.example.barberiashop_app.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
     private UserPreferences userPrefs;
-    private ActivityMainBinding binding;    
+    //private UsuarioRepository usuarioRepository;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         userPrefs = new UserPreferences(this);
+        //usuarioRepository = new UsuarioRepository(this.getApplication());
+        AppDatabase.getDatabase(this);
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
