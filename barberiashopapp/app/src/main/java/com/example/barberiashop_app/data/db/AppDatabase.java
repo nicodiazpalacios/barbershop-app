@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
                 Rol.class,
                 EstadoTurno.class,
                 Usuario.class
-        }, version = 5,
+        }, version = 6,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -92,12 +92,6 @@ public abstract class AppDatabase extends RoomDatabase {
                 EstadoTurnoDao estadoTurnoDao = INSTANCIA.estadoTurnoDao();
                 UsuarioDao usuarioDao = INSTANCIA.usuarioDao();
 
-                // --- SERVICIOS ---
-                servicioDao.insert(new Servicio("Corte de pelo (Hombre)", "Corte clásico o moderno con tijera y/o máquina.", 8.00, 40));
-                servicioDao.insert(new Servicio("Arreglo de barba", "Afeitado tradicional con navaja y perfilado de barba.", 7.50, 30));
-                servicioDao.insert(new Servicio("Corte y Barba Full", "Servicio completo de corte de pelo y arreglo de barba.", 14.50, 70));
-                servicioDao.insert(new Servicio("Diseño de cejas", "Perfilado profesional de cejas con cera o pinzas.", 4.00, 15));
-                servicioDao.insert(new Servicio("Lavado y Secado", "Lavado con productos especializados y peinado rápido.", 4.50, 20));
 
                 // --- ROLES ---
                 Rol rolCliente = new Rol("cliente");
@@ -106,6 +100,13 @@ public abstract class AppDatabase extends RoomDatabase {
                 rolDao.insert(rolCliente);
                 rolDao.insert(rolBarbero);
                 rolDao.insert(rolDueno);
+
+                // --- SERVICIOS ---
+                servicioDao.insert(new Servicio("Corte de pelo (Hombre)", "Corte clásico o moderno con tijera y/o máquina.", 8.00, 40));
+                servicioDao.insert(new Servicio("Arreglo de barba", "Afeitado tradicional con navaja y perfilado de barba.", 7.50, 30));
+                servicioDao.insert(new Servicio("Corte y Barba Full", "Servicio completo de corte de pelo y arreglo de barba.", 14.50, 70));
+                servicioDao.insert(new Servicio("Diseño de cejas", "Perfilado profesional de cejas con cera o pinzas.", 4.00, 15));
+                servicioDao.insert(new Servicio("Lavado y Secado", "Lavado con productos especializados y peinado rápido.", 4.50, 20));
 
                 // --- ESTADOS DE TURNO ---
                 estadoTurnoDao.insert(new EstadoTurno("pendiente"));
