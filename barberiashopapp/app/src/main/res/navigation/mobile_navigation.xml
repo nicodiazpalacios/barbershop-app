@@ -6,6 +6,12 @@
     app:startDestination="@id/loginFragment">
 
     <fragment
+        android:id="@+id/navigation_mapa_negocio"
+        android:name="com.example.barberiashop_app.ui.mapa_negocio.MapaNegocioFragment"
+        android:label="@string/title_mapa_negocio"
+        tools:layout="@layout/fragment_mapa_negocio" />
+
+    <fragment
         android:id="@+id/navigation_servicios"
         android:name="com.example.barberiashop_app.ui.servicios.ServiciosFragment"
         android:label="@string/title_servicio"
@@ -13,6 +19,9 @@
         <action
             android:id="@+id/action_serviciosFragment_to_reservarTurnoFragment"
             app:destination="@id/reservarTurnoFragment" />
+        <action
+            android:id="@+id/action_navigation_servicios_to_navigation_mapa_negocio"
+            app:destination="@id/navigation_mapa_negocio" />
     </fragment>
 
     <fragment

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.androidx.navigation.safeargs)
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
 android {
@@ -36,6 +37,8 @@ android {
 
 dependencies {
     implementation(libs.legacy.support.v4)
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation(libs.play.services.maps)
     val room_version = "2.8.1"
 
     implementation("androidx.room:room-runtime:$room_version")

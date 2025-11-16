@@ -16,4 +16,34 @@
     <string name="title_personal">Personal</string>
     <string name="title_turno">Turnos</string>
     <string name="title_perfil">Mi Perfil</string>
+
+<!--    actuales-->
+
+
+        <string name="service_not_available">Servicio de Geocodificación no disponible</string>
+        <string name="invalid_lat_long_used">Latitud o Longitud inválida</string>
+        <string name="no_address_found">No se encontró la dirección</string>
+        <string name="location_permission_denied">Permiso de ubicación denegado. Se requiere para esta función.</string>
+        <string name="permission_required_hint">Se requiere el permiso de ubicación para mostrar tu posición.</string>
+        <string name="address_text_display">Mi Ubicación:\n%1$s\n(Última actualización: %2$tH:%2$tM:%2$tS)</string>
+        <string name="navigate_button_text">¿CÓMO LLEGAR?</string>
+    <string name="title_mapa_negocio">BarberShop</string>
+
+
+    <!--    en desuso-->
+<!--    <string name="get_location">Obtener Localizacion</string>-->
+<!--    <string name="android_image">Android Image</string>-->
+<!--    <string name="textview_hint">Presione el boton para comenzar la localizacion.-->
+<!--    </string>-->
+<!--    <string name="location_permission_denied">Permiso de Localizacion denegada,-->
+<!--        Por favor habilite los permisos para usar esta app.-->
+<!--    </string>-->
+<!--    <string name="address_text">"Direccion: %1$s \n Timestamp: %2$tr"</string>-->
+<!--    <string name="no_location">Localizacion no disponible</string>-->
+<!--    <string name="no_address_found">Direccion no encontrada</string>-->
+<!--    <string name="loading">Cargando…</string>-->
+<!--    <string name="service_not_available">Servicio no disponible</string>-->
+<!--    <string name="invalid_lat_long_used">Coordenadas usadas invalidas</string>-->
+<!--    <string name="start_tracking_location">Comenzar seguimiento de localizacion</string>-->
+<!--    <string name="stop_tracking_location">Detener seguimiento de localizacion</string>-->
 </resources>
