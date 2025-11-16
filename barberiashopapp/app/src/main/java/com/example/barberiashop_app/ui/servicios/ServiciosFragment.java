@@ -44,6 +44,11 @@ public class ServiciosFragment extends Fragment implements ServiciosListAdapter.
             adapter.submitList(servicios);
         });
 
+        // Configurar el click del nuevo botón
+        binding.btnVerUbicacion.setOnClickListener(v -> {
+            NavHostFragment.findNavController(this).navigate(R.id.action_navigation_servicios_to_navigation_mapa_negocio);
+        });
+
         // Opcional: Configurar el título si no está fijo en el XML
         // binding.tvTituloServicios.setText("Servicios disponibles");
         return root;
