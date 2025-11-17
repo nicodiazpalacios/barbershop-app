@@ -35,4 +35,8 @@ public interface TurnoDao {
     //Nuevo: obtener solo los turnos de un usuario específico
     @Query("SELECT * FROM turnos WHERE usuario_email = :email ORDER BY fecha ASC")
     LiveData<List<Turno>> getTurnosByUsuario(String email);
+
+    // Consulta para verificar la existencia de un turno en un día y hora específicos
+    @Query("SELECT COUNT(id) FROM turnos WHERE fecha = :fecha AND horario_inicio = :horario")
+    int countTurnosByFechaAndHorario(String fecha, String horario);
 }

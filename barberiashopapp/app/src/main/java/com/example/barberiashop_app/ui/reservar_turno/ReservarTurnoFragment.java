@@ -182,6 +182,28 @@ public class ReservarTurnoFragment extends Fragment {
             return;
         }
 
+        // --- LÓGICA DE VERIFICACIÓN DE DUPLICADOS ---
+        try {
+            // **1. Ejecutar la verificación en el hilo principal con Future.get()**
+            // NOTA: Esto es una solución RÁPIDA para Java sin Coroutines/LiveData.
+            // Para una aplicación más robusta, se preferiría una verificación asíncrona
+            // usando LiveData en el ViewModel o un Callback.
+            int count = viewModel.countTurnosByFechaAndHorario(fecha, horario);
+
+            if (count > 0) {
+                // Hay un turno duplicado
+                Toast.makeText(getContext(), "ERROR: Ya existe un turno reservado para esta fecha y hora.", Toast.LENGTH_LONG).show();
+                return; // Detener la ejecución
+            }
+
+        } catch (Exception e) {
+            // Manejar posibles errores del Executor o de la BD
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Ocurrió un error al verificar la disponibilidad.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // --- FIN DE LÓGICA DE VERIFICACIÓN ---
+
         // Obtener email del usuario logueado
         UserPreferences userPrefs = new UserPreferences(requireContext());
         String usuarioEmail = userPrefs.getRegisteredEmail();
@@ -189,7 +211,7 @@ public class ReservarTurnoFragment extends Fragment {
         // Crear turno (por ahora horarioFin puede ser el mismo o calculado según duración)
         Turno nuevoTurno = new Turno(fecha, horario, horario, usuarioEmail);
 
-        // Insertar en la BD
+        // Insertar en la BD (solo si la verificación pasó)
         viewModel.insertTurno(nuevoTurno);
 
         Toast.makeText(getContext(), "✅ Reserva confirmada: " + fecha + " a las " + horario, Toast.LENGTH_LONG).show();

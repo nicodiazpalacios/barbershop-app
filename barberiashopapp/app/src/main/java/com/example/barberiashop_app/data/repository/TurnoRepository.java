@@ -9,6 +9,8 @@ import com.example.barberiashop_app.data.db.AppDatabase;
 import com.example.barberiashop_app.domain.entity.Turno;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class TurnoRepository {
 
@@ -44,5 +46,11 @@ public class TurnoRepository {
     public void deleteAll(){
         AppDatabase.databaseWriteExecutor.execute(() -> turnoDao.deleteAll());
     }
-
+    // verificar la disponibilidad
+    public int countTurnosByFechaAndHorario(String fecha, String horario) throws ExecutionException, InterruptedException {
+        Future<Integer> future = AppDatabase.databaseWriteExecutor.submit(() ->
+                turnoDao.countTurnosByFechaAndHorario(fecha, horario)
+        );
+        return future.get(); // Espera y obtiene el resultado de la consulta
+    }
 }
