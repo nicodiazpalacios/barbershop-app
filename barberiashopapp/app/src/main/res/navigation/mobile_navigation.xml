@@ -41,7 +41,7 @@
         <action
             android:id="@+id/action_reservarTurnoFragment_to_navigation_turnos"
             app:destination="@id/navigation_turnos"
-            app:popUpTo="@id/reservarTurnoFragment"
+            app:popUpTo="@id/navigation_servicios"
             app:popUpToInclusive="true" />
 
     </fragment>

@@ -61,6 +61,16 @@ public class TurnosFragment extends Fragment {
             Navigation.findNavController(v).navigate(R.id.navigation_servicios);
         });
 
+        //  Manejo del botón de retroceso (btnBack)
+        binding.btnBack.setOnClickListener(v -> {
+            // Ya que TurnosFragment es un destino raíz,
+            // TODO: la lógica de retroceso puede ser:
+            // 1. Ocultar el botón (recomendado)
+            // 2. Usar popBackStack para simular el botón de atrás del sistema.
+            //    Si no hay nada más en la pila, simplemente cierra la app o va al inicio.
+            Navigation.findNavController(v).navigate(R.id.navigation_servicios);
+        });
+
         return root;
     }
 

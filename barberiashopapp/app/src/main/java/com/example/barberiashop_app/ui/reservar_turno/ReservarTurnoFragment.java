@@ -62,7 +62,11 @@ public class ReservarTurnoFragment extends Fragment {
         binding.layoutHorario.setEndIconOnClickListener(v -> showTimeOptions());
 
         binding.btnConfirmarReserva.setOnClickListener(v -> confirmReservation());
-        binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+//        binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        binding.btnBack
+                .setOnClickListener(v -> Navigation
+                        .findNavController(v)
+                        .popBackStack());
 
         return root;
     }
