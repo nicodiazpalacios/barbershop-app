@@ -37,6 +37,20 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+
+            // AÑADIR: Si el destino actual es un fragmento hijo de una pestaña,
+            // asegúrate de que el ítem de la pestaña padre esté seleccionado.
+            if (destination.getId() == R.id.reservarTurnoFragment) {
+                // Selecciona visualmente la pestaña "Servicios"
+                navView.getMenu().findItem(R.id.navigation_servicios).setChecked(true);
+            }
+
+
+//            if (destination.getId() == R.id.reservarTurnoFragment) {
+//                // Selecciona visualmente la pestaña "Servicios"
+//                navView.getMenu().findItem(R.id.navigation_servicios).setChecked(true);
+//            }
+//
             if (destination.getId() == R.id.loginFragment ||
                 destination.getId() == R.id.registerFragment ||
                 destination.getId() == R.id.recuperarContraseniaFragment) {
