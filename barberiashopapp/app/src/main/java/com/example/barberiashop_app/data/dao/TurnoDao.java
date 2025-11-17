@@ -6,17 +6,20 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.example.barberiashop_app.domain.entity.Turno;
+import com.example.barberiashop_app.domain.entity.TurnoConServicio;
 
 import java.util.List;
 
 @Dao
 public interface TurnoDao {
 
+    //CAMBIO CLAVE: Cambiar void a long para que devuelva el ID generado
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(Turno turno);
+    long insert(Turno turno);
 
     @Update
     void update(Turno turno);
@@ -39,4 +42,9 @@ public interface TurnoDao {
     // Consulta para verificar la existencia de un turno en un día y hora específicos
     @Query("SELECT COUNT(id) FROM turnos WHERE fecha = :fecha AND horario_inicio = :horario")
     int countTurnosByFechaAndHorario(String fecha, String horario);
+
+    // Consulta para la relación N:M (usada en el ViewModel)
+    @Transaction
+    @Query("SELECT * FROM turnos WHERE usuario_email = :email ORDER BY fecha ASC")
+    LiveData<List<TurnoConServicio>> getTurnosConServiciosByUsuario(String email);
 }
