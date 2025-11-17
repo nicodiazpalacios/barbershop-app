@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.barberiashop_app.R;
@@ -42,9 +43,33 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
         holder.textEstado.setText(turno.getEstadoNombre()); // asumiendo que tenés ese campo o relación
 
 
-        holder.textEstado.setOnClickListener(v -> {
-            if (listener != null) listener.onEstadoClick(turno);
-        });
+//        holder.textEstado.setOnClickListener(v -> {
+//            if (listener != null) listener.onEstadoClick(turno);
+//        });
+
+        holder.textEstado.setText(turno.getEstadoNombre());
+
+        // Lógica para aplicar estilos y estado de clic
+        if (turno.getEstadoId() == 3) { // 3 es Cancelado
+            // Estado CANCELADO: Deshabilitado visual y funcionalmente
+            holder.textEstado.setBackgroundResource(R.drawable.bg_status_cancelled);
+            holder.textEstado.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.grey_disabled_text));
+            holder.textEstado.setEnabled(false); // Deshabilitar el componente
+            holder.textEstado.setClickable(false);
+            holder.textEstado.setAlpha(0.7f); // Opcional: bajar la opacidad
+            holder.textEstado.setOnClickListener(null); // Quitar listener
+        } else {
+            // Estado PENDIENTE (o cualquier otro estado clicable)
+            holder.textEstado.setBackgroundResource(R.drawable.bg_status_pending);
+            holder.textEstado.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending_text));
+            holder.textEstado.setEnabled(true); // Habilitar componente
+            holder.textEstado.setClickable(true);
+            holder.textEstado.setAlpha(1.0f);
+
+            holder.textEstado.setOnClickListener(v -> {
+                if (listener != null) listener.onEstadoClick(turno);
+            });
+        }
     }
 
     @Override

@@ -6,8 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
+    android:layout_marginBottom="42dp"
     tools:context=".ui.turnos.TurnosFragment">
 
+<!--    TODO: HACER UN FILTRO DE TURNOS PENDIENTES / CANCELADOS / TODOS-->
     <ImageButton
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
@@ -38,7 +40,8 @@
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/btnBack" app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:listitem="@layout/item_turno" />
