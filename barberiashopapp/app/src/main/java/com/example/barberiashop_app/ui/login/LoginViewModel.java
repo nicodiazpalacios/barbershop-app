@@ -33,7 +33,7 @@ public class LoginViewModel extends AndroidViewModel {
         usuarioRepository.login(email, password).observeForever(new androidx.lifecycle.Observer<Usuario>() {
             @Override
             public void onChanged(Usuario usuario) {
-                // 💡 El repositorio ya hizo setLoggedIn y saveLoggedInUserEmail si usuario != null
+                // El repositorio ya hizo setLoggedIn y saveLoggedInUserEmail si usuario != null
                 if (usuario != null) {
                     loginResult.postValue(true);
                 } else {
