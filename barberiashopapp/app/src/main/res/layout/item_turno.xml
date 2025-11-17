@@ -36,14 +36,15 @@
         android:drawablePadding="6dp" />
 
 
-    <!--        android:backgroundTint="@color/estado_pendiente"-->
-    <!--        android:background="@drawable/bg_estado_chip"-->
     <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
         android:id="@+id/textEstado"
-        android:text="Pendiente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_status_pending"
+        android:gravity="center"
         android:padding="4dp"
-        android:textSize="14sp"
-        android:layout_marginTop="4dp" />
+        android:text="Pendiente"
+        android:textColor="@color/status_pending_text"
+        android:textSize="14sp" />
 </LinearLayout>

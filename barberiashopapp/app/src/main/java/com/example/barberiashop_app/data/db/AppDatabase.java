@@ -12,11 +12,13 @@ import com.example.barberiashop_app.data.dao.EstadoTurnoDao;
 import com.example.barberiashop_app.data.dao.RolDao;
 import com.example.barberiashop_app.data.dao.ServicioDao;
 import com.example.barberiashop_app.data.dao.TurnoDao;
+import com.example.barberiashop_app.data.dao.TurnoServicioDao;
 import com.example.barberiashop_app.data.dao.UsuarioDao;
 import com.example.barberiashop_app.domain.entity.EstadoTurno;
 import com.example.barberiashop_app.domain.entity.Rol;
 import com.example.barberiashop_app.domain.entity.Servicio;
 import com.example.barberiashop_app.domain.entity.Turno;
+import com.example.barberiashop_app.domain.entity.TurnoServicio;
 import com.example.barberiashop_app.domain.entity.Usuario;
 
 import java.util.concurrent.ExecutorService;
@@ -28,8 +30,9 @@ import java.util.concurrent.Executors;
                 Servicio.class,
                 Rol.class,
                 EstadoTurno.class,
-                Usuario.class
-        }, version = 6,
+                Usuario.class,
+                TurnoServicio.class,
+        }, version = 7,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -53,6 +56,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract UsuarioDao usuarioDao();
     public abstract RolDao rolDao();
     public abstract EstadoTurnoDao estadoTurnoDao();
+    public abstract TurnoServicioDao turnoServicioDao();
 
     //  Metodo estatico que devuelve la instancia unica de la base de datos.
     // Si no existe, se crea utilizando Room.databaseBuilder.

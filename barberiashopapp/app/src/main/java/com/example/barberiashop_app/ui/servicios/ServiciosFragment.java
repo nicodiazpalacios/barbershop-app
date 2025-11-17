@@ -71,11 +71,11 @@ public class ServiciosFragment extends Fragment implements ServiciosListAdapter.
     public void onReservarClick(Servicio servicio) {
         Toast.makeText(getContext(), "Has seleccionado: " + servicio.getNombre(), Toast.LENGTH_SHORT).show();
 
-        // 🧭 Crear la acción de navegación con Safe Args
+        //  Crear la acción de navegación con Safe Args
         ServiciosFragmentDirections.ActionServiciosFragmentToReservarTurnoFragment action =
                 ServiciosFragmentDirections.actionServiciosFragmentToReservarTurnoFragment(servicio.getId());
 
-        // 🔀 Navegar al fragmento de reserva
+        // Navegar al fragmento de reserva
 
         NavHostFragment.findNavController(this).navigate(action);
     }

@@ -12,6 +12,8 @@ import com.example.barberiashop_app.data.repository.TurnoRepository;
 import com.example.barberiashop_app.domain.entity.Servicio;
 import com.example.barberiashop_app.domain.entity.Turno;
 
+import java.util.concurrent.ExecutionException;
+
 public class ReservarTurnoViewModel extends AndroidViewModel {
     private final ServicioRepository servicioRepository;
     private final TurnoRepository turnoRepository;
@@ -26,8 +28,14 @@ public class ReservarTurnoViewModel extends AndroidViewModel {
         return servicioRepository.getServicioById(id);
     }
 
-    public void insertTurno(Turno turno) {
-        turnoRepository.insert(turno);
+    // 💡 MÉTODO ANTIGUO: public void insertTurno(Turno turno) { turnoRepository.insert(turno); }
+
+    // 💡 NUEVO MÉTODO: Insertar Turno y su relación
+    public long insertTurnoAndServicio(Turno turno, int servicioId) throws ExecutionException, InterruptedException {
+        return turnoRepository.insertTurnoAndServicio(turno, servicioId);
+    }
+    public int countTurnosByFechaAndHorario(String fecha, String horario) throws ExecutionException, InterruptedException {
+        return turnoRepository.countTurnosByFechaAndHorario(fecha, horario);
     }
 }
 

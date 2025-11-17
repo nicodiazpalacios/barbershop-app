@@ -47,7 +47,7 @@ public class UsuarioRepository {
 
     // --- Métodos de Autenticación (Room) ---
 
-    // 💡 Login: Busca en la DB. Si existe, guarda el estado de sesión y el email en SharedPreferences.
+    // Login: Busca en la DB. Si existe, guarda el estado de sesión y el email en SharedPreferences.
     public LiveData<Usuario> login(String email, String password) {
         final MutableLiveData<Usuario> result = new MutableLiveData<>();
         executorService.execute(() -> {
@@ -61,12 +61,12 @@ public class UsuarioRepository {
         return result;
     }
 
-    // 💡 Registro: Inserta en la DB.
+    // Registro: Inserta en la DB.
     public void register(Usuario usuario) {
         executorService.execute(() -> usuarioDao.insert(usuario));
     }
 
-    // 💡 Obtener Perfil: Recupera el usuario logueado de la DB usando el email de SharedPreferences.
+    // Obtener Perfil: Recupera el usuario logueado de la DB usando el email de SharedPreferences.
     public LiveData<Usuario> getLoggedInUser() {
         String email = userPreferences.getRegisteredEmail();
         if (email != null && !email.isEmpty()) {
@@ -76,14 +76,14 @@ public class UsuarioRepository {
         return new MutableLiveData<>(null);
     }
 
-    // 💡 Logout: Cierra sesión y borra el email de SharedPreferences.
+    // Logout: Cierra sesión y borra el email de SharedPreferences.
     public void logout() {
         userPreferences.setLoggedIn(false);
         userPreferences.clearLoggedInUser();
         // Nota: No borramos los datos del usuario de Room, solo la sesión.
     }
 
-    // 💡 Actualizar Perfil:
+    // Actualizar Perfil:
     public void updateProfile(Usuario usuario) {
         executorService.execute(() -> usuarioDao.insert(usuario)); // Usamos insert con REPLACE
     }

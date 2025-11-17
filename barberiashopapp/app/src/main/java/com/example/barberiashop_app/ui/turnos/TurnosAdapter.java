@@ -6,17 +6,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.barberiashop_app.R;
 import com.example.barberiashop_app.domain.entity.Turno;
+import com.example.barberiashop_app.domain.entity.TurnoConServicio;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewHolder> {
 
-    private List<Turno> turnos = new ArrayList<>();
+    private List<TurnoConServicio> turnos = new ArrayList<>();
     private OnEstadoClickListener listener;
 
     public interface OnEstadoClickListener {
@@ -27,7 +29,7 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
         this.listener = listener;
     }
 
-    public void setTurnos(List<Turno> nuevosTurnos) {
+    public void setTurnos(List<TurnoConServicio> nuevosTurnos) {
         this.turnos = nuevosTurnos;
         notifyDataSetChanged();
     }
@@ -35,16 +37,44 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
 
     @Override
     public void onBindViewHolder(@NonNull TurnoViewHolder holder, int position) {
-        Turno turno = turnos.get(position);
+        // 1. Obtener el POJO TurnoConServicio y la entidad Turno
+        TurnoConServicio itemConServicio = turnos.get(position); // 'turnos' debe ser ahora List<TurnoConServicio>
+        Turno turno = itemConServicio.turno; // Accede a la entidad Turno incrustada
+
+        // 2. Obtener el nombre del Servicio (la parte que siempre decía "Corte de pelo")
+        String nombreServicio = (itemConServicio.servicios != null && !itemConServicio.servicios.isEmpty())
+                ? itemConServicio.servicios.get(0).getNombre()
+                : "Servicio Desconocido";
+
+        // 3. Asignar datos del Turno y Servicio al ViewHolder
+        //  Los datos de Turno se acceden a través de la entidad 'turno'
         holder.textFecha.setText(turno.getFecha());
         holder.textHora.setText(turno.getHorarioInicio());
-        holder.textServicio.setText("Corte de pelo"); // temporal, hasta unir con servicio
-        holder.textEstado.setText(turno.getEstadoNombre()); // asumiendo que tenés ese campo o relación
+        holder.textServicio.setText(nombreServicio); // FIX: Usa el nombre del servicio real
+        holder.textEstado.setText(turno.getEstadoNombre());
 
+        // 4. Lógica para aplicar estilos y estado de clic (usando 'turno')
+        if (turno.getEstadoId() == 3) { // 3 es Cancelado
+            // Estado CANCELADO: Deshabilitado visual y funcionalmente
+            holder.textEstado.setBackgroundResource(R.drawable.bg_status_cancelled);
+            holder.textEstado.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.grey_disabled_text));
+            holder.textEstado.setEnabled(false);
+            holder.textEstado.setClickable(false);
+            holder.textEstado.setAlpha(0.7f);
+            holder.textEstado.setOnClickListener(null);
+        } else {
+            // Estado PENDIENTE (o cualquier otro estado clicable)
+            holder.textEstado.setBackgroundResource(R.drawable.bg_status_pending);
+            holder.textEstado.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending_text));
+            holder.textEstado.setEnabled(true);
+            holder.textEstado.setClickable(true);
+            holder.textEstado.setAlpha(1.0f);
 
-        holder.textEstado.setOnClickListener(v -> {
-            if (listener != null) listener.onEstadoClick(turno);
-        });
+            // Configurar el listener para el estado
+            holder.textEstado.setOnClickListener(v -> {
+                if (listener != null) listener.onEstadoClick(turno);
+            });
+        }
     }
 
     @Override

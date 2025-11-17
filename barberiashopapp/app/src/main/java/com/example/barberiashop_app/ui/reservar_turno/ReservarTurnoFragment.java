@@ -37,6 +37,7 @@ import java.util.TimeZone;
 public class ReservarTurnoFragment extends Fragment {
     private FragmentReservarTurnoBinding binding;
     private ReservarTurnoViewModel viewModel;
+    private Servicio servicioSeleccionado;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -51,6 +52,7 @@ public class ReservarTurnoFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(ReservarTurnoViewModel.class);
         viewModel.getServicioById(servicioId).observe(getViewLifecycleOwner(), servicio -> {
             if (servicio != null) {
+                servicioSeleccionado = servicio;
                 displayServicioDetails(servicio);
             }
         });
@@ -62,7 +64,11 @@ public class ReservarTurnoFragment extends Fragment {
         binding.layoutHorario.setEndIconOnClickListener(v -> showTimeOptions());
 
         binding.btnConfirmarReserva.setOnClickListener(v -> confirmReservation());
-        binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+//        binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        binding.btnBack
+                .setOnClickListener(v -> Navigation
+                        .findNavController(v)
+                        .popBackStack());
 
         return root;
     }
@@ -173,24 +179,49 @@ public class ReservarTurnoFragment extends Fragment {
         String fecha = binding.inputFecha.getText().toString();
         String horario = binding.inputHorario.getText().toString();
 
+        if (servicioSeleccionado == null) {
+            Toast.makeText(getContext(), "Error: El servicio no ha sido cargado aún.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         if (fecha.equals("Seleccionar fecha") || horario.equals("Seleccionar horario")) {
             Toast.makeText(getContext(), "Selecciona fecha y horario antes de confirmar", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Obtener email del usuario logueado
-        UserPreferences userPrefs = new UserPreferences(requireContext());
-        String usuarioEmail = userPrefs.getRegisteredEmail();
+        // --- LÓGICA DE VERIFICACIÓN DE DUPLICADOS ---
+        try {
+            int count = viewModel.countTurnosByFechaAndHorario(fecha, horario);
+            if (count > 0) {
+                Toast.makeText(getContext(), " ERROR: Ya existe un turno reservado para esta fecha y hora.", Toast.LENGTH_LONG).show();
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Ocurrió un error al verificar la disponibilidad.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // --- FIN DE LÓGICA DE VERIFICACIÓN ---
 
-        // Crear turno (por ahora horarioFin puede ser el mismo o calculado según duración)
-        Turno nuevoTurno = new Turno(fecha, horario, horario, usuarioEmail);
+        try {
+            // Obtener email del usuario logueado
+            UserPreferences userPrefs = new UserPreferences(requireContext());
+            String usuarioEmail = userPrefs.getRegisteredEmail();
 
-        // Insertar en la BD
-        viewModel.insertTurno(nuevoTurno);
+            // Crear turno (el ID será generado y devuelto por el repositorio)
+            Turno nuevoTurno = new Turno(fecha, horario, horario, usuarioEmail);
 
-        Toast.makeText(getContext(), "✅ Reserva confirmada: " + fecha + " a las " + horario, Toast.LENGTH_LONG).show();
-        NavController navController = Navigation.findNavController(requireView());
-        navController.navigate(R.id.action_reservarTurnoFragment_to_navigation_turnos);
+            // LLAMADA CLAVE: Insertar el Turno y la relación TurnoServicio en una transacción
+            long newTurnoId = viewModel.insertTurnoAndServicio(nuevoTurno, servicioSeleccionado.getId());
 
+            // Si la inserción es exitosa:
+            Toast.makeText(getContext(), "Reserva confirmada: " + fecha + " a las " + horario, Toast.LENGTH_LONG).show();
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_reservarTurnoFragment_to_navigation_turnos);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Error al confirmar la reserva: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 }
