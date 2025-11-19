@@ -52,8 +52,9 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //
             if (destination.getId() == R.id.loginFragment ||
-                destination.getId() == R.id.registerFragment ||
-                destination.getId() == R.id.recuperarContraseniaFragment) {
+                    destination.getId() == R.id.registerFragment ||
+                    destination.getId() == R.id.recuperarContraseniaFragment ||
+                    destination.getId() == R.id.navigation_mapa_negocio) {
                 navView.setVisibility(View.GONE);
             } else {
                 navView.setVisibility(View.VISIBLE);

@@ -4,12 +4,14 @@ package com.example.barberiashop_app.ui.mapa_negocio;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +26,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Locale;
@@ -35,11 +39,15 @@ public class MapaNegocioFragment extends Fragment implements OnMapReadyCallback 
 
     private GoogleMap mMap;
     private MapaNegocioViewModel viewModel;
+    private Marker mUserLocationMarker;
 
     // Vistas de la UI
     private TextView mAddressTextView;
     private TextView mDistanceTextView;
     private Button mNavigateButton;
+    private ImageButton mBtnBack;
+    private Location location;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,6 +65,7 @@ public class MapaNegocioFragment extends Fragment implements OnMapReadyCallback 
         View root = inflater.inflate(R.layout.fragment_mapa_negocio, container, false);
 
         // Inicializar Vistas (Asegúrate de que estos IDs existan en tu layout)
+        mBtnBack = root.findViewById(R.id.btnBack);
         mAddressTextView = root.findViewById(R.id.textview_user_address);
         mDistanceTextView = root.findViewById(R.id.textview_distance);
         mNavigateButton = root.findViewById(R.id.button_navigate);
@@ -76,6 +85,13 @@ public class MapaNegocioFragment extends Fragment implements OnMapReadyCallback 
     }
 
     private void setupListeners() {
+        mBtnBack.setOnClickListener(v -> {
+            // Usar popBackStack del NavController o requireActivity().onBackPressed()
+            if (getParentFragmentManager() != null) {
+                getParentFragmentManager().popBackStack();
+            }
+        });
+
         mNavigateButton.setOnClickListener(v -> navigateToBarber());
     }
 
@@ -89,6 +105,37 @@ public class MapaNegocioFragment extends Fragment implements OnMapReadyCallback 
         viewModel.distanceToBarber.observe(getViewLifecycleOwner(), distance -> {
             mDistanceTextView.setText(distance);
         });
+
+        // Observar la ubicación en tiempo real del usuario
+        viewModel.userLocation.observe(getViewLifecycleOwner(), location -> {
+            if (location != null && mMap != null) {
+                // Llamamos a una función para actualizar el marcador en el mapa
+                updateUserLocationMarker(location);
+            }
+        });
+    }
+
+    /**
+     * Crea o actualiza el marcador de la ubicación del usuario en el mapa.
+     * @param location La ubicación actual del usuario.
+     */
+    private void updateUserLocationMarker(Location location) {
+        this.location = location;
+        LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        if (mUserLocationMarker == null) {
+            // Si el marcador no existe, lo creamos por primera vez
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(userLatLng)
+                    .title("Tu Ubicación")
+                    //  Usamos un color diferente (azul) para distinguirlo
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+
+            mUserLocationMarker = mMap.addMarker(markerOptions);
+        } else {
+            // Si el marcador ya existe, solo actualizamos su posición
+            mUserLocationMarker.setPosition(userLatLng);
+        }
     }
 
     // --- Manejo de Ciclo de Vida del Fragment ---
