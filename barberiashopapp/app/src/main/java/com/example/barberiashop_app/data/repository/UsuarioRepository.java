@@ -17,10 +17,7 @@ import com.example.barberiashop_app.domain.entity.UserResponse;
 import com.example.barberiashop_app.domain.entity.Usuario;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,9 +39,7 @@ public class UsuarioRepository {
         apiService = RetrofitClient.getService();
     }
 
-    // ----------------------------------------------------------------
-    // 1. LOGIN REMOTO
-    // ----------------------------------------------------------------
+
     public void loginRemoto(String email, String password, MutableLiveData<Boolean> loginResult) {
         LoginRequest request = new LoginRequest(email, password);
         Log.d("API_LOGIN", "Intentando login con: " + email);
@@ -78,9 +73,6 @@ public class UsuarioRepository {
         });
     }
 
-    // ----------------------------------------------------------------
-    // 2. REGISTER REMOTO
-    // ----------------------------------------------------------------
     public void registerRemoto(String firstName, String lastName, String email, String password, MutableLiveData<Boolean> registerResult) {
         String finalFirstName = formatName(firstName, "Nombre");
         String finalLastName = formatName(lastName, "Apellido");
@@ -109,9 +101,7 @@ public class UsuarioRepository {
         });
     }
 
-    // ----------------------------------------------------------------
-    // 3. OBTENER PERFIL (CORREGIDO PARA MOSTRAR PASS)
-    // ----------------------------------------------------------------
+
     public void fetchUserProfile(MutableLiveData<Usuario> userData) {
         String userId = userPreferences.getUserId();
         if (userId == null) return;
@@ -122,8 +112,6 @@ public class UsuarioRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     UserResponse apiUser = response.body();
 
-                    // --- CORRECCIÓN AQUÍ ---
-                    // En lugar de "********", buscamos la contraseña guardada localmente
                     String savedPassword = userPreferences.getUserPassword();
                     String passwordDisplay = (savedPassword != null) ? savedPassword : "";
 
@@ -148,9 +136,6 @@ public class UsuarioRepository {
         });
     }
 
-    // ----------------------------------------------------------------
-    // 4. ACTUALIZAR PERFIL
-    // ----------------------------------------------------------------
     public void updateProfileRemoto(String firstName, String lastName, String email, String password, MutableLiveData<Boolean> updateResult) {
         String userId = userPreferences.getUserId();
         if (userId == null) {

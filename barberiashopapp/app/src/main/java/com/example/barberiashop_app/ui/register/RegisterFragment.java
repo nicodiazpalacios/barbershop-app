@@ -44,7 +44,7 @@ public class RegisterFragment extends Fragment {
                 NavController navController = NavHostFragment.findNavController(this);
                 navController.navigate(R.id.action_registerFragment_to_loginFragment);
             } else {
-                // CASO ERROR (Esto es lo que faltaba)
+                // CASO ERROR
                 Toast.makeText(getContext(), "Error en el registro. Verifique sus datos o intente más tarde.", Toast.LENGTH_LONG).show();
             }
         });
