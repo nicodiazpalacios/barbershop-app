@@ -87,9 +87,17 @@
         android:name="com.example.barberiashop_app.ui.register.RegisterFragment"
         android:label="fragment_register"
         tools:layout="@layout/fragment_register" >
+<!--        &lt;!&ndash; Esta acción ya existía &ndash;&gt;-->
+<!--        <action-->
+<!--            android:id="@+id/action_registerFragment_to_navigation_servicios"-->
+<!--            app:destination="@id/navigation_servicios" />-->
+
+        <!-- NUEVA ACCIÓN: Ir al Login limpiando la pila -->
         <action
-            android:id="@+id/action_registerFragment_to_navigation_servicios"
-            app:destination="@id/navigation_servicios" />
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
