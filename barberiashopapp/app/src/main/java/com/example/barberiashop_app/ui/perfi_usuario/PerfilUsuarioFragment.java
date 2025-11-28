@@ -20,7 +20,7 @@ import com.example.barberiashop_app.domain.entity.Usuario;
 
 public class PerfilUsuarioFragment extends Fragment {
 
-    private FragmentPerfilUsuarioBinding  binding;
+    private FragmentPerfilUsuarioBinding binding;
     private PerfilUsuarioViewModel userProfileViewModel;
 
     private Usuario currentUser; // Variable para almacenar el usuario actual
@@ -56,12 +56,24 @@ public class PerfilUsuarioFragment extends Fragment {
 
         // 2. Observar Resultado de la Actualización
         userProfileViewModel.getUpdateResult().observe(getViewLifecycleOwner(), updated -> {
-            if (updated) {
-                Toast.makeText(getContext(), "✅ Perfil actualizado correctamente.", Toast.LENGTH_SHORT).show();
-            } else {
-                // Aquí podrías manejar fallos si hubieras implementado un retorno de error más detallado en el Repositorio
-                // Toast.makeText(getContext(), "Error al guardar los cambios.", Toast.LENGTH_SHORT).show();
+            // 1. Manejar nulo para evitar repeticiones o errores
+            if (updated == null) {
+                return;
             }
+
+            if (updated) {
+                Toast.makeText(getContext(), "Perfil actualizado correctamente.", Toast.LENGTH_SHORT).show();
+
+                // 2. Forzamos la recarga inmediata de los datos desde la API para refrescar la pantalla
+                userProfileViewModel.loadUserProfile();
+
+            } else {
+                Toast.makeText(getContext(), "Error al guardar los cambios.", Toast.LENGTH_SHORT).show();
+            }
+
+            // 3. IMPORTANTE: Reseteamos el valor a null en el ViewModel
+            // Esto evita que el Toast salga de nuevo si rotas la pantalla o vuelves de otra pestaña
+            userProfileViewModel.resetUpdateState();
         });
 
         // 3. Observar Resultado del Logout
@@ -79,7 +91,6 @@ public class PerfilUsuarioFragment extends Fragment {
         binding.btnLogout.setOnClickListener(v -> userProfileViewModel.logoutUser());
         // Conectar el botón de guardar al nuevo método
         binding.btnGuardarCambios.setOnClickListener(v -> saveChanges());
-
     }
 
 
@@ -93,25 +104,24 @@ public class PerfilUsuarioFragment extends Fragment {
         }
 
         String nuevoNombre = binding.etNombre.getText().toString().trim();
-        String nuevoCelular = binding.etCelular.getText().toString().trim();
         String nuevaContrasenia = binding.etPassword.getText().toString().trim();
 
-        // 💡 Validación de Campos (Ejemplo básico)
-        if (nuevoNombre.isEmpty() || nuevoCelular.isEmpty() || nuevaContrasenia.isEmpty()) {
+        // Validación de Campos
+        if (nuevoNombre.isEmpty()  || nuevaContrasenia.isEmpty()) {
             Toast.makeText(getContext(), "Todos los campos son obligatorios.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 💡 Crear el objeto Usuario actualizado manteniendo los campos inmutables (ID, Email, RolId)
+        // Crear el objeto Usuario actualizado
         Usuario usuarioActualizado = new Usuario(
                 nuevoNombre,
                 currentUser.getEmail(), // Mantener el email
                 nuevaContrasenia,
                 currentUser.getFotoUrl(),
-                nuevoCelular,
+                null, // No actualizamos el celular
                 currentUser.getRolId() // Mantener el rol ID
         );
-        // Es crucial establecer el ID, ya que Room lo necesita para actualizar el registro existente.
+        // Es crucial establecer el ID
         usuarioActualizado.setId(currentUser.getId());
 
         userProfileViewModel.updateProfile(usuarioActualizado);

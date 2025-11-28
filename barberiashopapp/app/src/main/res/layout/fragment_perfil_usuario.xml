@@ -85,9 +85,12 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCelular"
+                android:enabled="false"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="phone" />
+                android:inputType="phone"
+                android:background="@android:color/transparent"
+                android:textColor="?android:attr/textColorSecondary"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
