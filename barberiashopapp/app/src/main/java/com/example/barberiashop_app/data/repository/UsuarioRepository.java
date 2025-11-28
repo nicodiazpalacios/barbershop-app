@@ -1,6 +1,7 @@
 package com.example.barberiashop_app.data.repository;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -8,6 +9,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.barberiashop_app.UserPreferences;
 import com.example.barberiashop_app.data.dao.UsuarioDao;
 import com.example.barberiashop_app.data.db.AppDatabase;
+import com.example.barberiashop_app.data.network.ApiService;
+import com.example.barberiashop_app.data.network.RetrofitClient;
+import com.example.barberiashop_app.domain.entity.LoginRequest;
+import com.example.barberiashop_app.domain.entity.RegisterRequest;
+import com.example.barberiashop_app.domain.entity.UserResponse;
 import com.example.barberiashop_app.domain.entity.Usuario;
 
 import java.util.List;
@@ -16,10 +22,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class UsuarioRepository {
     private final UsuarioDao usuarioDao;
     private final UserPreferences userPreferences;
     private final ExecutorService executorService;
+    private final ApiService apiService;
     private final LiveData<List<Usuario>> allUsuarios;
 
     public UsuarioRepository(Application application) {
@@ -28,108 +39,181 @@ public class UsuarioRepository {
         allUsuarios = usuarioDao.getAll();
         userPreferences = new UserPreferences(application.getApplicationContext());
         executorService = AppDatabase.databaseWriteExecutor;
+        apiService = RetrofitClient.getService();
     }
 
-    // --- Métodos de Sesión (SharedPreferences) ---
-    public void setLoggedIn(boolean isLoggedIn) {
-        userPreferences.setLoggedIn(isLoggedIn);
-    }
+    // ----------------------------------------------------------------
+    // 1. LOGIN REMOTO
+    // ----------------------------------------------------------------
+    public void loginRemoto(String email, String password, MutableLiveData<Boolean> loginResult) {
+        LoginRequest request = new LoginRequest(email, password);
+        Log.d("API_LOGIN", "Intentando login con: " + email);
 
-    // Este método permanece en el Repository para que los ViewModels accedan a la persistencia de sesión
-    public boolean isLoggedIn() {
-        return userPreferences.isLoggedIn();
-    }
+        apiService.loginUser(request).enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserResponse apiUser = response.body();
 
-    // Obtiene el email de la sesión guardada en SharedPreferences
-    public String getLoggedInUserEmail() {
-        return userPreferences.getRegisteredEmail();
-    }
+                    if (apiUser.getId() != null) userPreferences.saveUserId(apiUser.getId());
 
-    // --- Métodos de Autenticación (Room) ---
+                    // Guardar pass real para usarla después
+                    userPreferences.saveUserPassword(password);
 
-    // Login: Busca en la DB. Si existe, guarda el estado de sesión y el email en SharedPreferences.
-    public LiveData<Usuario> login(String email, String password) {
-        final MutableLiveData<Usuario> result = new MutableLiveData<>();
-        executorService.execute(() -> {
-            Usuario user = usuarioDao.getUserByCredentials(email, password);
-            if (user != null) {
-                userPreferences.setLoggedIn(true);
-                userPreferences.saveLoggedInUserEmail(user.getEmail()); // Guardar solo el email
+                    userPreferences.setLoggedIn(true);
+                    userPreferences.saveLoggedInUserEmail(apiUser.getEmail());
+
+                    Usuario roomUser = new Usuario(apiUser.getFirstName() + " " + apiUser.getLastName(), apiUser.getEmail(), "***", null, "", 1);
+                    executorService.execute(() -> usuarioDao.insert(roomUser));
+
+                    loginResult.postValue(true);
+                } else {
+                    loginResult.postValue(false);
+                }
             }
-            result.postValue(user); // postValue para actualizar LiveData desde el hilo de background
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                loginResult.postValue(false);
+            }
         });
-        return result;
     }
 
-    // Registro: Inserta en la DB.
-    public void register(Usuario usuario) {
-        executorService.execute(() -> usuarioDao.insert(usuario));
+    // ----------------------------------------------------------------
+    // 2. REGISTER REMOTO
+    // ----------------------------------------------------------------
+    public void registerRemoto(String firstName, String lastName, String email, String password, MutableLiveData<Boolean> registerResult) {
+        String finalFirstName = formatName(firstName, "Nombre");
+        String finalLastName = formatName(lastName, "Apellido");
+
+        RegisterRequest request = new RegisterRequest(finalFirstName, finalLastName, email, password);
+
+        apiService.registerUser(request).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.code() == 201) {
+                    // Guardamos la pass aunque no haya auto-login, por si acaso
+                    userPreferences.saveUserPassword(password);
+
+                    Usuario nuevoUsuario = new Usuario(finalFirstName + " " + finalLastName, email, password, null, "", 1);
+                    executorService.execute(() -> usuarioDao.insert(nuevoUsuario));
+
+                    registerResult.postValue(true);
+                } else {
+                    registerResult.postValue(false);
+                }
+            }
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                registerResult.postValue(false);
+            }
+        });
     }
 
-    // Obtener Perfil: Recupera el usuario logueado de la DB usando el email de SharedPreferences.
+    // ----------------------------------------------------------------
+    // 3. OBTENER PERFIL (CORREGIDO PARA MOSTRAR PASS)
+    // ----------------------------------------------------------------
+    public void fetchUserProfile(MutableLiveData<Usuario> userData) {
+        String userId = userPreferences.getUserId();
+        if (userId == null) return;
+
+        apiService.getUserProfile(userId).enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserResponse apiUser = response.body();
+
+                    // --- CORRECCIÓN AQUÍ ---
+                    // En lugar de "********", buscamos la contraseña guardada localmente
+                    String savedPassword = userPreferences.getUserPassword();
+                    String passwordDisplay = (savedPassword != null) ? savedPassword : "";
+
+                    Usuario user = new Usuario(
+                            apiUser.getFirstName() + " " + apiUser.getLastName(),
+                            apiUser.getEmail(),
+                            passwordDisplay, // Usamos la real
+                            null,
+                            "",
+                            1
+                    );
+
+                    try {
+                        if (apiUser.getId() != null) user.setId(Integer.parseInt(apiUser.getId()));
+                    } catch (NumberFormatException e) { }
+
+                    userData.postValue(user);
+                }
+            }
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) { }
+        });
+    }
+
+    // ----------------------------------------------------------------
+    // 4. ACTUALIZAR PERFIL
+    // ----------------------------------------------------------------
+    public void updateProfileRemoto(String firstName, String lastName, String email, String password, MutableLiveData<Boolean> updateResult) {
+        String userId = userPreferences.getUserId();
+        if (userId == null) {
+            updateResult.postValue(false);
+            return;
+        }
+
+        String finalFirstName = formatName(firstName, "Nombre");
+        String finalLastName = formatName(lastName, "Apellido");
+        String passwordToSend = password;
+
+        // Lógica para recuperar contraseña si se envían asteriscos o vacía
+        if (password.contains("*") || password.isEmpty()) {
+            String savedPassword = userPreferences.getUserPassword();
+            if (savedPassword != null && !savedPassword.isEmpty()) {
+                passwordToSend = savedPassword;
+            } else {
+                // Si no hay pass guardada y se intenta enviar basura, fallamos para proteger el server
+                Log.e("API_UPDATE", "Error: No hay contraseña válida para enviar.");
+                updateResult.postValue(false);
+                return;
+            }
+        } else {
+            // Si es una pass nueva válida, la guardamos
+            userPreferences.saveUserPassword(password);
+        }
+
+        RegisterRequest request = new RegisterRequest(finalFirstName, finalLastName, email, passwordToSend);
+
+        apiService.updateUserProfile(userId, request).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    updateResult.postValue(true);
+                } else {
+                    updateResult.postValue(false);
+                }
+            }
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                updateResult.postValue(false);
+            }
+        });
+    }
+
+    private String formatName(String input, String defaultVal) {
+        if (input == null || input.trim().isEmpty()) return defaultVal;
+        if (!input.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$")) return defaultVal;
+        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+    }
+
+    // Métodos auxiliares
+    public void logout() {
+        userPreferences.clearLoggedInUser();
+        userPreferences.setLoggedIn(false);
+    }
     public LiveData<Usuario> getLoggedInUser() {
         String email = userPreferences.getRegisteredEmail();
-        if (email != null && !email.isEmpty()) {
-            // Este método sí puede retornar LiveData directo del DAO
-            return usuarioDao.getUserByEmail(email);
-        }
+        if (email != null && !email.isEmpty()) return usuarioDao.getUserByEmail(email);
         return new MutableLiveData<>(null);
     }
-
-    // Logout: Cierra sesión y borra el email de SharedPreferences.
-    public void logout() {
-        userPreferences.setLoggedIn(false);
-        userPreferences.clearLoggedInUser();
-        // Nota: No borramos los datos del usuario de Room, solo la sesión.
-    }
-
-    // Actualizar Perfil:
-    public void updateProfile(Usuario usuario) {
-        executorService.execute(() -> usuarioDao.insert(usuario)); // Usamos insert con REPLACE
-    }
-
-    public LiveData<List<Usuario>> getAllUsuarios() {
-        return allUsuarios;
-    }
-
-    public LiveData<Usuario> findByEmail(String email) {
-        return usuarioDao.findByEmail(email);
-    }
-
-    public void  insert(Usuario usuario) {
-        AppDatabase
-                .databaseWriteExecutor
-                .execute(() -> usuarioDao.insert(usuario));
-    }
-
-    public void  update(Usuario usuario) {
-        AppDatabase
-                .databaseWriteExecutor
-                .execute(() -> usuarioDao.update(usuario));
-    }
-
-    public void saveLoggedInUserEmail(String email) {
-        userPreferences.saveLoggedInUserEmail(email);
-    }
-
-//    public Usuario login(String email, String password) {
-//        Future<Usuario> future = AppDatabase.databaseWriteExecutor.submit(new Callable<Usuario>() {
-//            @Override
-//            public Usuario call() {
-//                Usuario usuario = usuarioDao.getUsuarioPorEmailSync(email);
-//                if (usuario != null && usuario.getContrasenia().equals(password)) {
-//                    return usuario;
-//                }
-//                return null;
-//            }
-//        });
-//
-//        try {
-//            return future.get(); // bloquea hasta obtener el resultado
-//        } catch (ExecutionException | InterruptedException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-
+    public void update(Usuario usuario) { executorService.execute(() -> usuarioDao.update(usuario)); }
+    public LiveData<List<Usuario>> getAllUsuarios() { return allUsuarios; }
+    public void saveLoggedInUserEmail(String email) { userPreferences.saveLoggedInUserEmail(email); }
+    public void insert(Usuario usuario) { AppDatabase.databaseWriteExecutor.execute(() -> usuarioDao.insert(usuario)); }
 }
