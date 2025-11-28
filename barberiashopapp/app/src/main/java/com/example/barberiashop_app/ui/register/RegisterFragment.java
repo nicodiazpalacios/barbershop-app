@@ -36,11 +36,16 @@ public class RegisterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
+
         registerViewModel.getRegistrationResult().observe(getViewLifecycleOwner(), registered -> {
             if (registered) {
+                // CASO ÉXITO
                 Toast.makeText(getContext(), "Registro exitoso. Bienvenido", Toast.LENGTH_SHORT).show();
                 NavController navController = NavHostFragment.findNavController(this);
-                navController.navigate(R.id.action_registerFragment_to_navigation_servicios);
+                navController.navigate(R.id.action_registerFragment_to_loginFragment);
+            } else {
+                // CASO ERROR (Esto es lo que faltaba)
+                Toast.makeText(getContext(), "Error en el registro. Verifique sus datos o intente más tarde.", Toast.LENGTH_LONG).show();
             }
         });
 
