@@ -36,9 +36,15 @@ android {
 }
 
 dependencies {
-    implementation(libs.legacy.support.v4)
+    // 1. RETROFIT (Conexión API)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // 2. GOOGLE MAPS
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation(libs.legacy.support.v4)
     implementation(libs.play.services.maps)
+
     val room_version = "2.8.1"
 
     implementation("androidx.room:room-runtime:$room_version")
