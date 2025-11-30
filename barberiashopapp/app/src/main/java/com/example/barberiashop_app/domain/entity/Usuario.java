@@ -9,17 +9,10 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "usuario",
-        foreignKeys = @ForeignKey(
-                entity = Rol.class,
-                parentColumns = "id",
-                childColumns = "rol_id",
-                onDelete = NO_ACTION
-        ),
-        //(uniques constraints) de SQL
+@Entity(tableName = "usuario", foreignKeys = @ForeignKey(entity = Rol.class, parentColumns = "id", childColumns = "rol_id", onDelete = NO_ACTION),
+        // (uniques constraints) de SQL
         indices = {
-                @Index(value = {"email"}, unique = true),
-                @Index(value = {"celular"}, unique = true)
+                @Index(value = { "email" }, unique = true)
         })
 public class Usuario {
 
@@ -33,7 +26,7 @@ public class Usuario {
     private String email;
 
     @NonNull
-    private String contrasenia; //almacenada como hash, no texto plano
+    private String contrasenia; // almacenada como hash, no texto plano
 
     @ColumnInfo(name = "foto_url")
     private String fotoUrl;
@@ -42,9 +35,10 @@ public class Usuario {
     private String celular;
 
     @ColumnInfo(name = "rol_id")
-    private int rolId; //clave foranea a rol
+    private int rolId; // clave foranea a rol
 
-    public Usuario( @NonNull String nombre, @NonNull String email, @NonNull String contrasenia, String fotoUrl, @NonNull String celular, int rolId) {
+    public Usuario(@NonNull String nombre, @NonNull String email, @NonNull String contrasenia, String fotoUrl,
+            @NonNull String celular, int rolId) {
         this.nombre = nombre;
         this.email = email;
         this.contrasenia = contrasenia;

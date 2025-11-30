@@ -36,16 +36,18 @@ public class RegisterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
-
         registerViewModel.getRegistrationResult().observe(getViewLifecycleOwner(), registered -> {
             if (registered) {
                 // CASO ÉXITO
                 Toast.makeText(getContext(), "Registro exitoso. Bienvenido", Toast.LENGTH_SHORT).show();
                 NavController navController = NavHostFragment.findNavController(this);
                 navController.navigate(R.id.action_registerFragment_to_loginFragment);
-            } else {
-                // CASO ERROR
-                Toast.makeText(getContext(), "Error en el registro. Verifique sus datos o intente más tarde.", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        registerViewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && !error.isEmpty()) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -64,8 +66,45 @@ public class RegisterFragment extends Fragment {
             return;
         }
 
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(getContext(), "Por favor, ingresa un email válido.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!name.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ]{2,}\\s[a-zA-ZáéíóúÁÉÍÓÚñÑ]+.*$")) {
+            Toast.makeText(getContext(), "Ingresa Nombre y Apellido (solo letras, mín 2 letras nombre).",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (!isValidPassword(password)) {
+            Toast.makeText(getContext(),
+                    "La contraseña debe tener al menos 8 caracteres, una letra, un número y un carácter especial.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
         String photoURI = null;
         registerViewModel.registerUser(name, email, password, celular, photoURI);
+    }
+
+    private boolean isValidPassword(String password) {
+        if (password.length() < 8)
+            return false;
+        boolean hasLetter = false;
+        boolean hasDigit = false;
+        boolean hasSpecial = false;
+
+        for (char c : password.toCharArray()) {
+            if (Character.isLetter(c))
+                hasLetter = true;
+            else if (Character.isDigit(c))
+                hasDigit = true;
+            else if (!Character.isLetterOrDigit(c))
+                hasSpecial = true;
+        }
+
+        return hasLetter && hasDigit && hasSpecial;
     }
 
     @Override
