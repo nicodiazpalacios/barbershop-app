@@ -63,17 +63,61 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
         }
 
         // 4. Lógica para aplicar estilos y estado de clic (usando 'turno')
-        if (turno.getEstadoId() == 3) { // 3 es Cancelado
+        // 4. Lógica para aplicar estilos y estado de clic (usando 'turno')
+        boolean isCancelled = turno.getEstadoId() == 3; // 3 es Cancelado
+        boolean isFinished = false;
+
+        // Verificar si el turno ya pasó (Terminado)
+        if (!isCancelled) {
+            try {
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm",
+                        java.util.Locale.getDefault());
+                // Asumimos que el formato de fecha es dd/MM/yyyy y horario es HH:mm (o similar)
+                // Nota: turno.getHorarioInicio() puede venir como "08:00 AM", hay que tener
+                // cuidado con el parseo.
+                // Si el formato es "hh:mm a", ajustamos.
+
+                String fechaHoraStr = turno.getFecha() + " " + turno.getHorarioInicio();
+                // Intentar parsear con formato de 12 horas si tiene AM/PM, o 24 si no.
+                // Basado en ReservarTurnoFragment, parece ser "hh:mm a" (ej: 08:00 AM)
+                java.text.SimpleDateFormat sdfInput = new java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a",
+                        java.util.Locale.getDefault());
+
+                java.util.Date fechaTurno = sdfInput.parse(fechaHoraStr);
+                java.util.Date ahora = new java.util.Date();
+
+                if (fechaTurno != null && fechaTurno.before(ahora)) {
+                    isFinished = true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Si falla el parseo, asumimos que no es terminado para no romper la UI
+            }
+        }
+
+        if (isCancelled) {
             // Estado CANCELADO: Deshabilitado visual y funcionalmente
+            holder.textEstado.setText("Cancelado");
             holder.textEstado.setBackgroundResource(R.drawable.bg_status_cancelled);
             holder.textEstado
-                    .setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.grey_disabled_text));
+                    .setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_cancelled_text));
             holder.textEstado.setEnabled(false);
             holder.textEstado.setClickable(false);
             holder.textEstado.setAlpha(0.7f);
             holder.textEstado.setOnClickListener(null);
+        } else if (isFinished) {
+            // Estado TERMINADO: Verde
+            holder.textEstado.setText("Terminado");
+            holder.textEstado.setBackgroundResource(R.drawable.bg_status_finished);
+            holder.textEstado
+                    .setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_finished_text));
+            holder.textEstado.setEnabled(false); // No se puede cancelar si ya terminó
+            holder.textEstado.setClickable(false);
+            holder.textEstado.setAlpha(1.0f);
+            holder.textEstado.setOnClickListener(null);
         } else {
-            // Estado PENDIENTE (o cualquier otro estado clicable)
+            // Estado PENDIENTE (o cualquier otro estado futuro)
+            holder.textEstado.setText(turno.getEstadoNombre()); // Muestra "pendiente" o lo que venga de la BD
             holder.textEstado.setBackgroundResource(R.drawable.bg_status_pending);
             holder.textEstado
                     .setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending_text));
@@ -81,7 +125,7 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
             holder.textEstado.setClickable(true);
             holder.textEstado.setAlpha(1.0f);
 
-            // Configurar el listener para el estado
+            // Configurar el listener para el estado (para cancelar, etc.)
             holder.textEstado.setOnClickListener(v -> {
                 if (listener != null)
                     listener.onEstadoClick(turno);

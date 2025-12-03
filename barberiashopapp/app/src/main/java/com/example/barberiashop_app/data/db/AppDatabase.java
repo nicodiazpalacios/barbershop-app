@@ -31,7 +31,7 @@ import java.util.concurrent.Executors;
         EstadoTurno.class,
         Usuario.class,
         TurnoServicio.class,
-}, version = 10, exportSchema = false)
+}, version = 11, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     // Instancia unica de la base de datos (Singleton)
     // 'volatile' garantiza que siempre se lea el valor actualizado en memoria,
@@ -123,6 +123,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 estadoTurnoDao.insert(new EstadoTurno("pendiente"));
                 estadoTurnoDao.insert(new EstadoTurno("confirmado"));
                 estadoTurnoDao.insert(new EstadoTurno("cancelado"));
+                estadoTurnoDao.insert(new EstadoTurno("terminado"));
 
                 // --- USUARIOS ---
                 // Podés usar contraseñas simples por ahora, ya que no estás aplicando hash
