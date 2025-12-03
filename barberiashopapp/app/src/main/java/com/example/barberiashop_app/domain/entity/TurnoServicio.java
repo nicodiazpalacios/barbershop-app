@@ -6,23 +6,13 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 
-@Entity(tableName = "turno_servicio",
-        primaryKeys = {"id_turno", "id_servicio"}, //clave compuesta
+@Entity(tableName = "turno_servicio", primaryKeys = { "id_turno", "id_servicio" }, // clave compuesta
         foreignKeys = {
-            @ForeignKey(
-                    entity = Turno.class,
-                    parentColumns = "id",
-                    childColumns = "id_turno",
-                    onDelete = CASCADE
-            ),
-                @ForeignKey(
-                        entity = Servicio.class,
-                        parentColumns = "id",
-                        childColumns = "id_servicio",
-                        onDelete = CASCADE
-                )
-        })
+                @ForeignKey(entity = Turno.class, parentColumns = "id", childColumns = "id_turno", onDelete = CASCADE),
+                @ForeignKey(entity = Servicio.class, parentColumns = "id", childColumns = "id_servicio", onDelete = CASCADE)
+        }, indices = { @Index("id_servicio") })
 public class TurnoServicio {
     @ColumnInfo(name = "id_turno")
     @NonNull

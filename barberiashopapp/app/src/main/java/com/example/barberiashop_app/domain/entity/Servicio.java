@@ -3,6 +3,7 @@ package com.example.barberiashop_app.domain.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "servicios")
@@ -12,8 +13,12 @@ public class Servicio {
     private String nombre;
     private String descripcion;
     private double precio;
-    private int duracion; //minutos
+    private int duracion; // minutos
 
+    public Servicio() {
+    }
+
+    @Ignore
     public Servicio(@NonNull String nombre, String descripcion, @NonNull double precio, @NonNull int duracion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -33,15 +38,31 @@ public class Servicio {
         return nombre;
     }
 
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
     public String getDescripcion() {
         return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public double getPrecio() {
         return precio;
     }
 
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
     public int getDuracion() {
         return duracion;
+    }
+
+    public void setDuracion(int duracion) {
+        this.duracion = duracion;
     }
 }

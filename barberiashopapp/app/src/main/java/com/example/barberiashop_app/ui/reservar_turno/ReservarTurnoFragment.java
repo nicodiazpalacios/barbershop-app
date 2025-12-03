@@ -62,6 +62,13 @@ public class ReservarTurnoFragment extends Fragment {
         binding.inputHorario.setOnClickListener(v -> showTimeOptions());
         binding.layoutHorario.setEndIconOnClickListener(v -> showTimeOptions());
 
+        // --- INICIO LÓGICA PELUQUERO ---
+        String[] peluqueros = new String[] { "Cualquiera", "Carlos", "Ricardo", "Javier" };
+        ArrayAdapter<String> adapterPeluquero = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_dropdown_item_1line, peluqueros);
+        binding.inputPeluquero.setAdapter(adapterPeluquero);
+        // --- FIN LÓGICA PELUQUERO ---
+
         binding.btnConfirmarReserva.setOnClickListener(v -> confirmReservation());
         binding.btnBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
@@ -215,8 +222,21 @@ public class ReservarTurnoFragment extends Fragment {
             UserPreferences userPrefs = new UserPreferences(requireContext());
             String usuarioEmail = userPrefs.getRegisteredEmail();
 
+            if (usuarioEmail == null || usuarioEmail.isEmpty()) {
+                Toast.makeText(getContext(),
+                        "Error: No se encontró el email del usuario. Por favor, inicia sesión nuevamente.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            // Obtener peluquero seleccionado
+            String peluquero = binding.inputPeluquero.getText().toString();
+            if (peluquero.isEmpty()) {
+                peluquero = "Cualquiera";
+            }
+
             // Crear turno (el ID será generado y devuelto por el repositorio)
-            Turno nuevoTurno = new Turno(fecha, horario, horario, usuarioEmail);
+            Turno nuevoTurno = new Turno(fecha, horario, horario, usuarioEmail, peluquero);
 
             // LLAMADA CLAVE: Insertar el Turno y la relación TurnoServicio en una
             // transacción

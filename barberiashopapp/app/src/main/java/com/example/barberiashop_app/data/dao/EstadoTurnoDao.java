@@ -24,4 +24,10 @@ public interface EstadoTurnoDao {
 
     @Query("SELECT * FROM estado_turno WHERE id = :id")
     EstadoTurno findById(int id);
+
+    @Query("SELECT COUNT(*) FROM estado_turno")
+    int count();
+
+    @Query("SELECT * FROM estado_turno WHERE nombre = :nombre LIMIT 1")
+    EstadoTurno findByName(String nombre);
 }

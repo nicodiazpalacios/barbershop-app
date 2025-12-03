@@ -31,7 +31,7 @@ import java.util.concurrent.Executors;
         EstadoTurno.class,
         Usuario.class,
         TurnoServicio.class,
-}, version = 8, exportSchema = false)
+}, version = 10, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     // Instancia unica de la base de datos (Singleton)
     // 'volatile' garantiza que siempre se lea el valor actualizado en memoria,

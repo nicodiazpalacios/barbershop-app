@@ -102,6 +102,26 @@
             tools:text="30 min" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutPeluquero"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Peluquero"
+        app:layout_constraintTop_toBottomOf="@id/cardServicio"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <AutoCompleteTextView
+            android:id="@+id/inputPeluquero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:text="Cualquiera"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
 <!--    app:endIconMode="manual"-->
     <com.google.android.material.textfield.TextInputLayout
@@ -114,7 +134,7 @@
         app:endIconMode="custom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardServicio">
+        app:layout_constraintTop_toBottomOf="@id/layoutPeluquero">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputFecha"

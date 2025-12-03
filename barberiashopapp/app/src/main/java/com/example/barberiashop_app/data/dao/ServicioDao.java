@@ -32,4 +32,7 @@ public interface ServicioDao {
     @Query("SELECT * FROM servicios WHERE id = :id")
     LiveData<Servicio> getServicioById(int id);
 
+    @Query("SELECT COUNT(*) FROM servicios")
+    int count();
+
 }

@@ -11,8 +11,10 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "usuario", foreignKeys = @ForeignKey(entity = Rol.class, parentColumns = "id", childColumns = "rol_id", onDelete = NO_ACTION),
         // (uniques constraints) de SQL
+        // (uniques constraints) de SQL
         indices = {
-                @Index(value = { "email" }, unique = true)
+                @Index(value = { "email" }, unique = true),
+                @Index("rol_id")
         })
 public class Usuario {
 
