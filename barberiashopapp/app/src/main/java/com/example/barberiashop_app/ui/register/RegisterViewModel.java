@@ -13,6 +13,7 @@ public class RegisterViewModel extends AndroidViewModel {
 
     private final UsuarioRepository usuarioRepository;
     private MutableLiveData<Boolean> registrationResult = new MutableLiveData<>();
+    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     public RegisterViewModel(@NonNull Application application) {
         super(application);
@@ -21,6 +22,10 @@ public class RegisterViewModel extends AndroidViewModel {
 
     public LiveData<Boolean> getRegistrationResult() {
         return registrationResult;
+    }
+
+    public LiveData<String> getErrorMessage() {
+        return errorMessage;
     }
 
     public void registerUser(String nombreCompleto, String email, String password, String celular, String photoURI) {
@@ -35,7 +40,8 @@ public class RegisterViewModel extends AndroidViewModel {
             firstName = capitalize(nombreCompleto);
             lastName = ".";
         }
-        usuarioRepository.registerRemoto(firstName, lastName, email, password, registrationResult);
+        usuarioRepository.registerRemoto(firstName, lastName, email, password, celular, registrationResult,
+                errorMessage);
     }
 
     private String capitalize(String input) {

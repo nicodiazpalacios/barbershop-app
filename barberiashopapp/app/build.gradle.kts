@@ -44,10 +44,14 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation(libs.legacy.support.v4)
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.work.runtime)
 
     val room_version = "2.8.1"
 
     implementation("androidx.room:room-runtime:$room_version")
+
+    // WorkManager via Version Catalog
+    // WorkManager via Version Catalog (Removed duplicate)
 
     annotationProcessor("androidx.room:room-compiler:$room_version")
 

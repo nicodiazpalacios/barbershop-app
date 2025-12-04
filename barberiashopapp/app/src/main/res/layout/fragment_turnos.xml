@@ -56,8 +56,23 @@
         app:layout_constraintTop_toBottomOf="@id/btnBack"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btnVerTodos"
         tools:listitem="@layout/item_turno" />
+
+    <TextView
+        android:id="@+id/btnVerTodos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ver Todos"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/teal_700"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
 
     <!-- Vista vacía (se superpone solo cuando no hay turnos) -->
     <LinearLayout

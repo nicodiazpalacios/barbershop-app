@@ -55,6 +55,11 @@
 
     </fragment>
 
+    <fragment
+        android:id="@+id/navigation_alert"
+        android:name="com.example.barberiashop_app.ui.notificaciones.NotificacionesFragment"
+        android:label="@string/title_notificaciones"
+        tools:layout="@layout/fragment_notificaciones" />
 
     <fragment
         android:id="@+id/navigation_notifications"
