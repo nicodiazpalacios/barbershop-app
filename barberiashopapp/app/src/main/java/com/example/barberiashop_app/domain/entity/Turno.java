@@ -109,6 +109,8 @@ public class Turno {
                 return "Confirmado";
             case 3:
                 return "Cancelado";
+            case 4:
+                return "Finalizado";
             default:
                 return "Desconocido";
         }

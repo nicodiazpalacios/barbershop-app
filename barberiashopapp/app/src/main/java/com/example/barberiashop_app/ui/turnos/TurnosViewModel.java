@@ -7,7 +7,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.Transformations;
 
 import com.example.barberiashop_app.UserPreferences;
@@ -31,7 +30,7 @@ public class TurnosViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<TurnoConServicio>> turnosFiltradosYOrdenados = new MediatorLiveData<>(); // LiveData
                                                                                                                  // transformado
     private final MutableLiveData<String> filtroActual = new MutableLiveData<>("PENDIENTE"); // Estado inicial
-    private final MutableLiveData<String> ordenActual = new MutableLiveData<>("FECHA_ASC"); // Orden inicial
+    private final MutableLiveData<String> ordenActual = new MutableLiveData<>("DEFAULT"); // Orden inicial (Pila/LIFO)
 
     public TurnosViewModel(@NonNull Application application) {
         super(application);
@@ -138,7 +137,8 @@ public class TurnosViewModel extends AndroidViewModel {
         String filtro = filtroActual.getValue();
         if (filtro != null && !filtro.equals("TODOS")) {
             listaProcesada = listaProcesada.stream()
-                    .filter(t -> t.turno.getEstadoNombre().toUpperCase().contains(filtro.toUpperCase()))
+                    .filter(t -> t.estadoTurno != null
+                            && t.estadoTurno.getNombre().toUpperCase().contains(filtro.toUpperCase()))
                     .collect(Collectors.toList());
         }
 
@@ -154,31 +154,59 @@ public class TurnosViewModel extends AndroidViewModel {
 
     // Lógica del Comparador ajustada a TurnoConServicio
     private Comparator<TurnoConServicio> getComparator(String orden) {
+        // 1. COMPARADOR BASE: Prioridad a PENDIENTE (estado_id = 1)
+        Comparator<TurnoConServicio> priorityComparator = (t1, t2) -> {
+            boolean t1Pending = t1.estadoTurno != null && "Pendiente".equalsIgnoreCase(t1.estadoTurno.getNombre());
+            boolean t2Pending = t2.estadoTurno != null && "Pendiente".equalsIgnoreCase(t2.estadoTurno.getNombre());
+
+            if (t1Pending && !t2Pending)
+                return -1; // t1 primero
+            if (!t1Pending && t2Pending)
+                return 1; // t2 primero
+            return 0; // Ambos son pendientes o ambos no lo son
+        };
+
+        Comparator<TurnoConServicio> secondaryComparator;
+
         switch (orden) {
             case "FECHA_DESC":
-                return Comparator.comparing((TurnoConServicio t) -> t.turno.getFecha(), Collections.reverseOrder());
+                secondaryComparator = Comparator.comparing((TurnoConServicio t) -> t.turno.getFecha(),
+                        Collections.reverseOrder());
+                break;
             case "HORARIO_ASC":
-                return Comparator.comparing((TurnoConServicio t) -> t.turno.getHorarioInicio());
+                secondaryComparator = Comparator.comparing((TurnoConServicio t) -> t.turno.getHorarioInicio());
+                break;
             case "SERVICIO_AZ":
                 // AJUSTE: Ordenar por el nombre del primer servicio asociado
-                return Comparator.comparing((TurnoConServicio t) -> (t.servicios != null && !t.servicios.isEmpty())
-                        ? t.servicios.get(0).getNombre()
-                        : "");
+                secondaryComparator = Comparator.comparing(
+                        (TurnoConServicio t) -> (t.servicios != null && !t.servicios.isEmpty())
+                                ? t.servicios.get(0).getNombre()
+                                : "");
+                break;
             case "ESTADO":
-                return Comparator.comparing((TurnoConServicio t) -> t.turno.getEstadoId());
+                secondaryComparator = Comparator.comparing((TurnoConServicio t) -> t.turno.getEstadoId());
+                break;
             case "PRECIO_DESC":
                 // AJUSTE: Sumar precios si hay múltiples servicios o usar el primero
-                return (t1, t2) -> {
+                secondaryComparator = (t1, t2) -> {
                     double precio1 = (t1.servicios != null && !t1.servicios.isEmpty()) ? t1.servicios.get(0).getPrecio()
                             : 0.0;
                     double precio2 = (t2.servicios != null && !t2.servicios.isEmpty()) ? t2.servicios.get(0).getPrecio()
                             : 0.0;
                     return Double.compare(precio2, precio1); // Descendente
                 };
+                break;
             case "FECHA_ASC":
+                secondaryComparator = Comparator.comparing((TurnoConServicio t) -> t.turno.getFecha());
+                break;
+            case "DEFAULT":
             default:
-                return Comparator.comparing((TurnoConServicio t) -> t.turno.getFecha());
+                // LIFO (Stack): ID descendente
+                secondaryComparator = (t1, t2) -> Integer.compare(t2.turno.getId(), t1.turno.getId());
+                break;
         }
+
+        return priorityComparator.thenComparing(secondaryComparator);
     }
 
     /**

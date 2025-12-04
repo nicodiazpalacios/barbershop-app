@@ -21,6 +21,8 @@ import com.example.barberiashop_app.databinding.FragmentTurnosBinding;
 public class TurnosFragment extends Fragment {
     private FragmentTurnosBinding binding;
     private TurnosAdapter adapter;
+    private java.util.List<com.example.barberiashop_app.domain.entity.TurnoConServicio> currentTurnos;
+    private boolean showingAll = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -39,14 +41,8 @@ public class TurnosFragment extends Fragment {
         // SharedPreferences.
         viewModel.refreshUserData();
         viewModel.getTurnosUsuario().observe(getViewLifecycleOwner(), turnos -> {
-            if (turnos == null || turnos.isEmpty()) {
-                binding.recyclerTurnos.setVisibility(View.GONE);
-                binding.layoutNoTurnos.setVisibility(View.VISIBLE);
-            } else {
-                binding.recyclerTurnos.setVisibility(View.VISIBLE);
-                binding.layoutNoTurnos.setVisibility(View.GONE);
-                adapter.setTurnos(turnos);
-            }
+            currentTurnos = turnos; // Guardar la lista completa
+            updateUI();
         });
 
         adapter.setOnEstadoClickListener(turno -> {
@@ -76,6 +72,11 @@ public class TurnosFragment extends Fragment {
 
         binding.btnFiltroOrden.setOnClickListener(v -> showFilterOrderDialog(viewModel));
 
+        binding.btnVerTodos.setOnClickListener(v -> {
+            showingAll = true;
+            updateUI();
+        });
+
         return root;
     }
 
@@ -88,6 +89,7 @@ public class TurnosFragment extends Fragment {
                 "Servicio (A-Z)",
                 "Estado: Pendiente",
                 "Estado: Cancelado",
+                "Estado: Finalizado",
                 "Mostrar Todos"
         };
 
@@ -99,6 +101,7 @@ public class TurnosFragment extends Fragment {
                 "SERVICIO_AZ",
                 "PENDIENTE",
                 "CANCELADO",
+                "FINALIZADO",
                 "TODOS"
         };
 
@@ -113,7 +116,7 @@ public class TurnosFragment extends Fragment {
                         viewModel.setFiltro("TODOS"); // Limpiar filtro si se ordena
                     } else if (key.equals("TODOS")) {
                         // Si es "Mostrar Todos"
-                        viewModel.setOrden("FECHA_ASC"); // Restaurar orden por defecto
+                        viewModel.setOrden("DEFAULT"); // Restaurar orden por defecto (Pila/LIFO)
                         viewModel.setFiltro("TODOS");
                     } else {
                         // Si es una opción de FILTRADO por estado
@@ -123,12 +126,26 @@ public class TurnosFragment extends Fragment {
                 .show();
     }
 
-    // @Override
-    // public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-    // super.onActivityCreated(savedInstanceState);
-    // mViewModel = new ViewModelProvider(this).get(TurnosViewModel.class);
-    // // TODO: Use the ViewModel
-    // }
+    private void updateUI() {
+        if (currentTurnos == null || currentTurnos.isEmpty()) {
+            binding.recyclerTurnos.setVisibility(View.GONE);
+            binding.layoutNoTurnos.setVisibility(View.VISIBLE);
+            binding.btnVerTodos.setVisibility(View.GONE);
+        } else {
+            binding.recyclerTurnos.setVisibility(View.VISIBLE);
+            binding.layoutNoTurnos.setVisibility(View.GONE);
+
+            if (!showingAll && currentTurnos.size() > 8) {
+                // Mostrar solo los primeros 8
+                adapter.setTurnos(currentTurnos.subList(0, 8));
+                binding.btnVerTodos.setVisibility(View.VISIBLE);
+            } else {
+                // Mostrar todos
+                adapter.setTurnos(currentTurnos);
+                binding.btnVerTodos.setVisibility(View.GONE);
+            }
+        }
+    }
 
     @Override
     public void onDestroy() {

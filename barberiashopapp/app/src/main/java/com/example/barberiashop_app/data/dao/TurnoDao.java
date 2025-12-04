@@ -17,7 +17,7 @@ import java.util.List;
 @Dao
 public interface TurnoDao {
 
-    //CAMBIO CLAVE: Cambiar void a long para que devuelva el ID generado
+    // CAMBIO CLAVE: Cambiar void a long para que devuelva el ID generado
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insert(Turno turno);
 
@@ -26,6 +26,7 @@ public interface TurnoDao {
 
     @Delete
     void delete(Turno turno);
+
     @Query("DELETE FROM turnos")
     void deleteAll();
 
@@ -35,16 +36,17 @@ public interface TurnoDao {
     @Query("SELECT * FROM turnos WHERE id = :id")
     Turno getTurnoById(int id);
 
-    //Nuevo: obtener solo los turnos de un usuario específico
-    @Query("SELECT * FROM turnos WHERE usuario_email = :email ORDER BY fecha ASC")
+    // Nuevo: obtener solo los turnos de un usuario específico
+    @Query("SELECT * FROM turnos WHERE usuario_email = :email ORDER BY estado_id ASC, id DESC")
     LiveData<List<Turno>> getTurnosByUsuario(String email);
 
-    // Consulta para verificar la existencia de un turno en un día y hora específicos
+    // Consulta para verificar la existencia de un turno en un día y hora
+    // específicos
     @Query("SELECT COUNT(id) FROM turnos WHERE fecha = :fecha AND horario_inicio = :horario")
     int countTurnosByFechaAndHorario(String fecha, String horario);
 
     // Consulta para la relación N:M (usada en el ViewModel)
     @Transaction
-    @Query("SELECT * FROM turnos WHERE usuario_email = :email ORDER BY fecha ASC")
+    @Query("SELECT * FROM turnos WHERE usuario_email = :email ORDER BY estado_id ASC, id DESC")
     LiveData<List<TurnoConServicio>> getTurnosConServiciosByUsuario(String email);
 }
