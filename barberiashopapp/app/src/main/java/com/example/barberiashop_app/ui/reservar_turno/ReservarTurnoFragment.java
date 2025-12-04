@@ -63,10 +63,11 @@ public class ReservarTurnoFragment extends Fragment {
         binding.layoutHorario.setEndIconOnClickListener(v -> showTimeOptions());
 
         // --- INICIO LÓGICA PELUQUERO ---
-        String[] peluqueros = new String[] { "Cualquiera", "Carlos", "Ricardo", "Javier" };
+        String[] peluqueros = new String[] { "Carlos", "Ricardo", "Javier" };
         ArrayAdapter<String> adapterPeluquero = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_dropdown_item_1line, peluqueros);
         binding.inputPeluquero.setAdapter(adapterPeluquero);
+        binding.inputPeluquero.setText(peluqueros[0], false);
         // --- FIN LÓGICA PELUQUERO ---
 
         binding.btnConfirmarReserva.setOnClickListener(v -> confirmReservation());
@@ -232,7 +233,7 @@ public class ReservarTurnoFragment extends Fragment {
             // Obtener peluquero seleccionado
             String peluquero = binding.inputPeluquero.getText().toString();
             if (peluquero.isEmpty()) {
-                peluquero = "Cualquiera";
+                peluquero = "Carlos";
             }
 
             // Crear turno (el ID será generado y devuelto por el repositorio)
@@ -242,15 +243,72 @@ public class ReservarTurnoFragment extends Fragment {
             // transacción
             long newTurnoId = viewModel.insertTurnoAndServicio(nuevoTurno, servicioSeleccionado.getId());
 
+            // Crear Notificación
+            com.example.barberiashop_app.data.repository.NotificacionRepository notificacionRepository = new com.example.barberiashop_app.data.repository.NotificacionRepository(
+                    requireContext());
+            com.example.barberiashop_app.domain.entity.Notificacion notificacion = new com.example.barberiashop_app.domain.entity.Notificacion(
+                    usuarioEmail,
+                    "Reserva Confirmada",
+                    "Tu turno para " + servicioSeleccionado.getNombre() + " el " + fecha + " a las " + horario
+                            + " ha sido confirmado.",
+                    System.currentTimeMillis());
+            notificacionRepository.insert(notificacion);
+
+            // Mostrar Notificación de Sistema (Push)
+            com.example.barberiashop_app.utils.NotificationHelper.showNotification(requireContext(),
+                    "Reserva Confirmada",
+                    "Tu turno para " + servicioSeleccionado.getNombre() + " el " + fecha + " a las " + horario
+                            + " ha sido confirmado.");
+
             // Si la inserción es exitosa:
             Toast.makeText(getContext(), "Reserva confirmada: " + fecha + " a las " + horario, Toast.LENGTH_LONG)
                     .show();
+
+            // PROGRAMAR RECORDATORIO (WORKMANAGER)
+            scheduleReminder(fecha, horario, servicioSeleccionado.getNombre(), usuarioEmail);
+
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_reservarTurnoFragment_to_navigation_turnos);
 
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(getContext(), "Error al confirmar la reserva: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void scheduleReminder(String fecha, String horario, String servicioNombre, String usuarioEmail) {
+        try {
+            // Parsear fecha y hora para obtener timestamp
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
+            Date date = sdf.parse(fecha + " " + horario);
+
+            if (date == null)
+                return;
+
+            long triggerTime = date.getTime() - (15 * 60 * 1000); // 15 minutos antes
+            long delay = triggerTime - System.currentTimeMillis();
+
+            if (delay > 0) {
+                androidx.work.Data data = new androidx.work.Data.Builder()
+                        .putString("titulo", "Recordatorio de Turno")
+                        .putString("mensaje", "Tenés un turno para " + servicioNombre + " en 15 minutos.")
+                        .putString("usuarioEmail", usuarioEmail)
+                        .build();
+
+                androidx.work.OneTimeWorkRequest workRequest = new androidx.work.OneTimeWorkRequest.Builder(
+                        com.example.barberiashop_app.workers.ReminderWorker.class)
+                        .setInitialDelay(delay, java.util.concurrent.TimeUnit.MILLISECONDS)
+                        .setInputData(data)
+                        .build();
+
+                androidx.work.WorkManager.getInstance(requireContext()).enqueue(workRequest);
+                android.util.Log.d("ReservarTurnoFragment", "Recordatorio programado para dentro de " + delay + "ms");
+            } else {
+                android.util.Log.d("ReservarTurnoFragment",
+                        "El tiempo para el recordatorio ya pasó o es muy pronto (delay=" + delay + ")");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

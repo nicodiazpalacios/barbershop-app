@@ -76,6 +76,12 @@ public class TurnoRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> turnoDao.update(turno));
     }
 
+    // Método síncrono para usar en background threads ya existentes (como en
+    // ViewModel)
+    public void updateSync(Turno turno) {
+        turnoDao.update(turno);
+    }
+
     public void delete(Turno turno) {
         AppDatabase.databaseWriteExecutor.execute(() -> turnoDao.delete(turno));
     }
@@ -100,5 +106,34 @@ public class TurnoRepository {
      */
     public LiveData<List<TurnoConServicio>> getTurnosConServicioByUsuario(String email) {
         return turnoDao.getTurnosConServiciosByUsuario(email);
+    }
+
+    /**
+     * Cancela un turno de manera síncrona, asegurando que el estado "Cancelado"
+     * exista.
+     * 
+     * @param turno El turno a cancelar.
+     */
+    public void cancelarTurnoSync(Turno turno) {
+        // 1. Buscar si existe el estado "Cancelado" (o "cancelado")
+        EstadoTurno estadoCancelado = estadoTurnoDao.findByName("Cancelado");
+        if (estadoCancelado == null) {
+            estadoCancelado = estadoTurnoDao.findByName("cancelado");
+        }
+
+        // 2. Si no existe, crearlo
+        if (estadoCancelado == null) {
+            EstadoTurno nuevoEstado = new EstadoTurno("Cancelado");
+            estadoTurnoDao.insert(nuevoEstado);
+            estadoCancelado = estadoTurnoDao.findByName("Cancelado");
+        }
+
+        // 3. Asignar el ID y actualizar
+        if (estadoCancelado != null) {
+            turno.setEstadoId(estadoCancelado.getId());
+            turnoDao.update(turno);
+        } else {
+            throw new RuntimeException("No se pudo obtener ni crear el estado 'Cancelado'");
+        }
     }
 }

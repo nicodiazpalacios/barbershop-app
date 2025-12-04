@@ -51,7 +51,21 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
         holder.textFecha.setText(turno.getFecha());
         holder.textHora.setText(turno.getHorarioInicio());
         holder.textServicio.setText(nombreServicio); // FIX: Usa el nombre del servicio real
-        holder.textEstado.setText(turno.getEstadoNombre());
+
+        // OBTENER NOMBRE DEL ESTADO DESDE LA BD (RELACIÓN)
+        String nombreEstado = "Desconocido";
+        if (itemConServicio.estadoTurno != null) {
+            nombreEstado = itemConServicio.estadoTurno.getNombre();
+        } else {
+            // Fallback si no se cargó la relación (aunque debería)
+            nombreEstado = turno.getEstadoNombre();
+        }
+
+        // Capitalizar primera letra
+        if (nombreEstado != null && !nombreEstado.isEmpty()) {
+            nombreEstado = nombreEstado.substring(0, 1).toUpperCase() + nombreEstado.substring(1).toLowerCase();
+        }
+        holder.textEstado.setText(nombreEstado);
 
         // Mostrar peluquero
         String peluquero = turno.getPeluquero();
@@ -63,21 +77,19 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
         }
 
         // 4. Lógica para aplicar estilos y estado de clic (usando 'turno')
-        // 4. Lógica para aplicar estilos y estado de clic (usando 'turno')
-        boolean isCancelled = turno.getEstadoId() == 3; // 3 es Cancelado
+        // USAR EL NOMBRE DEL ESTADO PARA DETERMINAR SI ESTÁ CANCELADO
+        boolean isCancelled = nombreEstado.equalsIgnoreCase("Cancelado");
         boolean isFinished = false;
 
         // Verificar si el turno ya pasó (Terminado)
         if (!isCancelled) {
             try {
-                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm",
-                        java.util.Locale.getDefault());
                 // Asumimos que el formato de fecha es dd/MM/yyyy y horario es HH:mm (o similar)
                 // Nota: turno.getHorarioInicio() puede venir como "08:00 AM", hay que tener
                 // cuidado con el parseo.
                 // Si el formato es "hh:mm a", ajustamos.
 
-                String fechaHoraStr = turno.getFecha() + " " + turno.getHorarioInicio();
+                String fechaHoraStr = turno.getFecha().trim() + " " + turno.getHorarioInicio().trim();
                 // Intentar parsear con formato de 12 horas si tiene AM/PM, o 24 si no.
                 // Basado en ReservarTurnoFragment, parece ser "hh:mm a" (ej: 08:00 AM)
                 java.text.SimpleDateFormat sdfInput = new java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a",
@@ -117,7 +129,7 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
             holder.textEstado.setOnClickListener(null);
         } else {
             // Estado PENDIENTE (o cualquier otro estado futuro)
-            holder.textEstado.setText(turno.getEstadoNombre()); // Muestra "pendiente" o lo que venga de la BD
+            holder.textEstado.setText(nombreEstado); // Muestra "Pendiente" (capitalizado)
             holder.textEstado.setBackgroundResource(R.drawable.bg_status_pending);
             holder.textEstado
                     .setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.status_pending_text));
@@ -127,8 +139,9 @@ public class TurnosAdapter extends RecyclerView.Adapter<TurnosAdapter.TurnoViewH
 
             // Configurar el listener para el estado (para cancelar, etc.)
             holder.textEstado.setOnClickListener(v -> {
-                if (listener != null)
+                if (listener != null) {
                     listener.onEstadoClick(turno);
+                }
             });
         }
     }

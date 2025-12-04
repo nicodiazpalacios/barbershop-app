@@ -28,7 +28,8 @@ public class TurnosViewModel extends AndroidViewModel {
     private final MutableLiveData<String> usuarioEmail = new MutableLiveData<>();
     private final LiveData<List<TurnoConServicio>> turnosOriginal; // LiveData de la BD
 
-    private final MediatorLiveData<List<TurnoConServicio>> turnosFiltradosYOrdenados = new MediatorLiveData<>(); // LiveData transformado
+    private final MediatorLiveData<List<TurnoConServicio>> turnosFiltradosYOrdenados = new MediatorLiveData<>(); // LiveData
+                                                                                                                 // transformado
     private final MutableLiveData<String> filtroActual = new MutableLiveData<>("PENDIENTE"); // Estado inicial
     private final MutableLiveData<String> ordenActual = new MutableLiveData<>("FECHA_ASC"); // Orden inicial
 
@@ -65,6 +66,53 @@ public class TurnosViewModel extends AndroidViewModel {
     public void actualizarTurno(Turno turno) {
         turnoRepository.update(turno);
     }
+
+    public void cancelarTurno(Turno turno, android.content.Context context) {
+        com.example.barberiashop_app.data.db.AppDatabase.databaseWriteExecutor.execute(() -> {
+            try {
+                // 1. Actualizar estado en BD (SÍNCRONO y SEGURO)
+                // Esto verificará si existe el estado "Cancelado" y lo creará si es necesario
+                turnoRepository.cancelarTurnoSync(turno);
+
+                // 2. Crear Notificación en BD
+                if (turno.getUsuarioEmail() != null) {
+                    com.example.barberiashop_app.data.repository.NotificacionRepository notificacionRepository = new com.example.barberiashop_app.data.repository.NotificacionRepository(
+                            context);
+                    com.example.barberiashop_app.domain.entity.Notificacion notificacion = new com.example.barberiashop_app.domain.entity.Notificacion(
+                            turno.getUsuarioEmail(),
+                            "Turno Cancelado",
+                            "Has cancelado tu turno del " + turno.getFecha() + " a las " + turno.getHorarioInicio()
+                                    + ".",
+                            System.currentTimeMillis());
+                    notificacionRepository.insertSync(notificacion); // Usar insertSync también para seguridad
+
+                    // 3. Mostrar Notificación de Sistema (Push) en el hilo principal
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        try {
+                            com.example.barberiashop_app.utils.NotificationHelper.showNotification(context,
+                                    "Turno Cancelado",
+                                    "Has cancelado tu turno del " + turno.getFecha() + " a las "
+                                            + turno.getHorarioInicio());
+                            android.widget.Toast
+                                    .makeText(context, "Turno cancelado correctamente",
+                                            android.widget.Toast.LENGTH_SHORT)
+                                    .show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                    android.widget.Toast
+                            .makeText(context, "Error al cancelar: " + e.getMessage(), android.widget.Toast.LENGTH_LONG)
+                            .show();
+                });
+            }
+        });
+    }
+
     // Nuevos métodos para la vista (Fragment)
 
     public void setFiltro(String filtro) {
@@ -112,17 +160,19 @@ public class TurnosViewModel extends AndroidViewModel {
             case "HORARIO_ASC":
                 return Comparator.comparing((TurnoConServicio t) -> t.turno.getHorarioInicio());
             case "SERVICIO_AZ":
-                //  AJUSTE: Ordenar por el nombre del primer servicio asociado
-                return Comparator.comparing((TurnoConServicio t) ->
-                        (t.servicios != null && !t.servicios.isEmpty()) ? t.servicios.get(0).getNombre() : ""
-                );
+                // AJUSTE: Ordenar por el nombre del primer servicio asociado
+                return Comparator.comparing((TurnoConServicio t) -> (t.servicios != null && !t.servicios.isEmpty())
+                        ? t.servicios.get(0).getNombre()
+                        : "");
             case "ESTADO":
                 return Comparator.comparing((TurnoConServicio t) -> t.turno.getEstadoId());
             case "PRECIO_DESC":
                 // AJUSTE: Sumar precios si hay múltiples servicios o usar el primero
                 return (t1, t2) -> {
-                    double precio1 = (t1.servicios != null && !t1.servicios.isEmpty()) ? t1.servicios.get(0).getPrecio() : 0.0;
-                    double precio2 = (t2.servicios != null && !t2.servicios.isEmpty()) ? t2.servicios.get(0).getPrecio() : 0.0;
+                    double precio1 = (t1.servicios != null && !t1.servicios.isEmpty()) ? t1.servicios.get(0).getPrecio()
+                            : 0.0;
+                    double precio2 = (t2.servicios != null && !t2.servicios.isEmpty()) ? t2.servicios.get(0).getPrecio()
+                            : 0.0;
                     return Double.compare(precio2, precio1); // Descendente
                 };
             case "FECHA_ASC":

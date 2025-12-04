@@ -24,7 +24,7 @@ public class TurnosFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+            @Nullable Bundle savedInstanceState) {
 
         binding = FragmentTurnosBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -35,7 +35,8 @@ public class TurnosFragment extends Fragment {
 
         TurnosViewModel viewModel = new ViewModelProvider(this).get(TurnosViewModel.class);
         // LLAMADA CLAVE: Refrescar el usuario ANTES de observar
-        // Esto asegura que el ViewModel obtenga el email más reciente de las SharedPreferences.
+        // Esto asegura que el ViewModel obtenga el email más reciente de las
+        // SharedPreferences.
         viewModel.refreshUserData();
         viewModel.getTurnosUsuario().observe(getViewLifecycleOwner(), turnos -> {
             if (turnos == null || turnos.isEmpty()) {
@@ -53,8 +54,7 @@ public class TurnosFragment extends Fragment {
                     .setTitle("Cancelar turno")
                     .setMessage("¿Querés cancelar este turno?")
                     .setPositiveButton("Sí, cancelar", (dialog, which) -> {
-                        turno.setEstadoId(3); // 3 = cancelado
-                        viewModel.actualizarTurno(turno);
+                        viewModel.cancelarTurno(turno, requireContext());
                     })
                     .setNegativeButton("No", null)
                     .show();
@@ -64,13 +64,13 @@ public class TurnosFragment extends Fragment {
             Navigation.findNavController(v).navigate(R.id.navigation_servicios);
         });
 
-        //  Manejo del botón de retroceso (btnBack)
+        // Manejo del botón de retroceso (btnBack)
         binding.btnBack.setOnClickListener(v -> {
             // Ya que TurnosFragment es un destino raíz,
             // TODO: la lógica de retroceso puede ser:
             // 1. Ocultar el botón (recomendado)
             // 2. Usar popBackStack para simular el botón de atrás del sistema.
-            //    Si no hay nada más en la pila, simplemente cierra la app o va al inicio.
+            // Si no hay nada más en la pila, simplemente cierra la app o va al inicio.
             Navigation.findNavController(v).navigate(R.id.navigation_servicios);
         });
 
@@ -123,12 +123,12 @@ public class TurnosFragment extends Fragment {
                 .show();
     }
 
-//    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        mViewModel = new ViewModelProvider(this).get(TurnosViewModel.class);
-//        // TODO: Use the ViewModel
-//    }
+    // @Override
+    // public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    // super.onActivityCreated(savedInstanceState);
+    // mViewModel = new ViewModelProvider(this).get(TurnosViewModel.class);
+    // // TODO: Use the ViewModel
+    // }
 
     @Override
     public void onDestroy() {

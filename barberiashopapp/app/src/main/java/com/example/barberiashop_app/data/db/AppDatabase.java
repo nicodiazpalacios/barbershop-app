@@ -9,12 +9,14 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.barberiashop_app.data.dao.EstadoTurnoDao;
+import com.example.barberiashop_app.data.dao.NotificacionDao;
 import com.example.barberiashop_app.data.dao.RolDao;
 import com.example.barberiashop_app.data.dao.ServicioDao;
 import com.example.barberiashop_app.data.dao.TurnoDao;
 import com.example.barberiashop_app.data.dao.TurnoServicioDao;
 import com.example.barberiashop_app.data.dao.UsuarioDao;
 import com.example.barberiashop_app.domain.entity.EstadoTurno;
+import com.example.barberiashop_app.domain.entity.Notificacion;
 import com.example.barberiashop_app.domain.entity.Rol;
 import com.example.barberiashop_app.domain.entity.Servicio;
 import com.example.barberiashop_app.domain.entity.Turno;
@@ -31,7 +33,9 @@ import java.util.concurrent.Executors;
         EstadoTurno.class,
         Usuario.class,
         TurnoServicio.class,
-}, version = 11, exportSchema = false)
+        Notificacion.class
+}, version = 12, exportSchema = false)
+// Database definition
 public abstract class AppDatabase extends RoomDatabase {
     // Instancia unica de la base de datos (Singleton)
     // 'volatile' garantiza que siempre se lea el valor actualizado en memoria,
@@ -60,6 +64,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract EstadoTurnoDao estadoTurnoDao();
 
     public abstract TurnoServicioDao turnoServicioDao();
+
+    public abstract NotificacionDao notificacionDao();
 
     // Metodo estatico que devuelve la instancia unica de la base de datos.
     // Si no existe, se crea utilizando Room.databaseBuilder.
